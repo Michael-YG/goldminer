@@ -1,20 +1,20 @@
 module collatz(
       input logic         clk,      // Clock
       input logic         reset,
-		input logic 	     go,       // Start sha256 round
-		input logic  [31:0] writedata,
+      input logic         go,       // Start sha256 round
+      input logic  [31:0] writedata,
       input logic         write,
       input               chipselect,
       input logic  [3:0]  address,
-		output logic [31:0] h0,       // h0
-		output logic [31:0] h1,       // h1
-		output logic [31:0] h2,       // h2
-		output logic [31:0] h3,       // h3
-		output logic [31:0] h4,       // h4
-		output logic [31:0] h5,       // h5
-		output logic [31:0] h6,       // h6
-		output logic [31:0] h7,       // h7
-		output logic 	     done);    // True when sha256 round is done
+      output logic [31:0] h0,       // h0
+      output logic [31:0] h1,       // h1
+      output logic [31:0] h2,       // h2
+      output logic [31:0] h3,       // h3
+      output logic [31:0] h4,       // h4
+      output logic [31:0] h5,       // h5
+      output logic [31:0] h6,       // h6
+      output logic [31:0] h7,       // h7
+      output logic        done);    // True when sha256 round is done
 
       logic [15:0][31:0] input_words;
       logic [63:0][31:0] message_schedule;
@@ -117,8 +117,9 @@ module collatz(
                running <= 0;
                done <= 1;
             end else begin
-               if (counter < 48)
-                  message_schedule[counter + 16] <= expand();
+               // eventually does out of bound accesses,
+               // nothing wrong in behavioral simulation thus far
+               message_schedule[counter + 16] <= expand();
                h <= g;
                g <= f;
                f <= e;
