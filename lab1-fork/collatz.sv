@@ -20,7 +20,6 @@ module collatz(
       logic [63:0][31:0] message_schedule;
       
       logic [7:0] counter;
-      logic running;
 
       logic [31:0] a, b, c, d, e, f, g, h;
    
@@ -91,7 +90,7 @@ module collatz(
       if (reset) begin
          counter <= 0;
          input_words <= 0;
-         running <= 0;
+         done <= 1;
          h0 <= 32'h6a09e667;
          h1 <= 32'hbb67ae85;
          h2 <= 32'h3c6ef372;
@@ -108,7 +107,6 @@ module collatz(
 
       if (go) begin
          message_schedule[15:0] <= input_words[15:0];
-         running <= 1;
          done <= 0;
          a <= h0;
          b <= h1;
@@ -119,7 +117,7 @@ module collatz(
          g <= h6;
          h <= h7;
       end else begin
-         if (running) begin
+         if (!done) begin
             if (counter == 64) begin
                h0 <= h0 + a;
                h1 <= h1 + b;
@@ -129,7 +127,6 @@ module collatz(
                h5 <= h5 + f;
                h6 <= h6 + g;
                h7 <= h7 + h;
-               running <= 0;
                done <= 1;
                counter <= 0;
             end else begin
@@ -146,8 +143,6 @@ module collatz(
                a <= temp1() + temp2();
                counter <= counter + 1;
             end
-         end else begin
-            counter <= counter;
          end
       end
    end

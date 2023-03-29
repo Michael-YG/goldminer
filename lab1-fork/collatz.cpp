@@ -3,13 +3,18 @@
 #include <verilated.h>
 #include <verilated_vcd_c.h>
 
+const unsigned ROUNDS = 7;
+const unsigned WRITE_OFFSET = 100;
+// Do not change - its 16 input words * (20 ns / (1 input word write))
+const unsigned WRITE_PERIOD = 320;
+
 int main(int argc, const char ** argv, const char ** env) {
   Verilated::commandArgs(argc, argv);
 
   // Treat the argument on the command-line as the place to start
-  int n;
-  if (argc > 1 && argv[1][0] != '+') n = atoi(argv[1]);
-  else n = 7; // Default
+  //int n;
+  //if (argc > 1 && argv[1][0] != '+') n = atoi(argv[1]);
+  //else n = 7; // Default
 
   Vcollatz * dut = new Vcollatz;  // Instantiate the collatz module
 
@@ -27,10 +32,11 @@ int main(int argc, const char ** argv, const char ** env) {
   dut->chipselect = 0;
 
   bool last_clk = true;
+  bool launched = false;
   int time;
-  int data = 0x00000000;
+  unsigned data = 0x00000000;
   unsigned count = 0;
-  unsigned mark = 0;
+  unsigned write_start_time = WRITE_OFFSET;
   unsigned address = 0;
   for (time = 0 ; time < 10000 ; time += 10) {
     dut->clk = ((time % 20) >= 10) ? 1 : 0; // Simulate a 50 MHz clock
@@ -38,7 +44,7 @@ int main(int argc, const char ** argv, const char ** env) {
       dut->reset = 1;
     }
 
-    if (time - mark >= 60 && time - mark < 380) {
+    if (time >= write_start_time && time < write_start_time + WRITE_PERIOD) {
       dut->reset = 0;
       dut->write = 1;
       dut->chipselect = 1;
@@ -52,26 +58,31 @@ int main(int argc, const char ** argv, const char ** env) {
     } else {
       dut->write = 0;
       dut->chipselect = 0;
-    }
-
-    if (time == 360) {
-      dut->go = 1;
-      mark = time;
-      data = 0x11111111;
       address = 0;
     }
-    if (time == 380) dut->go = 0;
+
+    if (time == WRITE_OFFSET + WRITE_PERIOD + 40) {
+      dut->go = 1;
+      launched = true;
+      write_start_time = time + WRITE_OFFSET;
+      data = data == 0xffffffff ? 0x00000000 : data + 0x11111111;
+    }
 
     dut->eval();     // Run the simulation for a cycle
     tfp->dump(time); // Write the VCD file for this cycle
 
     if (dut->clk && !last_clk && !dut->go) {
-      if (dut->done) {
+      if (dut->done && launched) {
          count++;
-         if (count == 2) 
+         if (count == ROUNDS) 
             break;
          else {
             dut->go = 1;
+            if (time % 20 == 0)
+               write_start_time = time + WRITE_OFFSET;
+            else
+               write_start_time = time + WRITE_OFFSET + 10;
+            data = data == 0xffffffff ? 0x00000000 : data + 0x11111111;
          }
       }
     } else if (dut->clk && !last_clk) {
