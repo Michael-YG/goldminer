@@ -100,9 +100,13 @@ module collatz(
          h5 <= 32'h9b05688c;
          h6 <= 32'h1f83d9ab;
          h7 <= 32'h5be0cd19;
-      end else if (chipselect && write) begin
+      end
+
+      if (chipselect && write) begin
          input_words[address] <= writedata;
-      end else if (go) begin
+      end
+
+      if (go) begin
          message_schedule[15:0] <= input_words[15:0];
          running <= 1;
          a <= h0;

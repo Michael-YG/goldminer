@@ -30,27 +30,35 @@ int main(int argc, const char ** argv, const char ** env) {
   int time;
   int data = 0x00000000;
   unsigned count = 0;
+  unsigned mark = 0;
+  unsigned address = 0;
   for (time = 0 ; time < 10000 ; time += 10) {
     dut->clk = ((time % 20) >= 10) ? 1 : 0; // Simulate a 50 MHz clock
     if (time == 0) {
       dut->reset = 1;
     }
-    if (time == 20) {
+
+    if (time - mark >= 60 && time - mark < 380) {
       dut->reset = 0;
       dut->write = 1;
       dut->chipselect = 1;
-    }
-    if (time >= 20 && time < 340) {
+
       if (time%20 == 0) {
         data = data == 0xffffffff ? 0x00000000 : data + 0x11111111;
-        dut->address = time / 20 - 1;
+        dut->address = address;
         dut->writedata = data;
+        address++;
       }
-    }
-    if (time == 360) {
+    } else {
       dut->write = 0;
       dut->chipselect = 0;
+    }
+
+    if (time == 360) {
       dut->go = 1;
+      mark = time;
+      data = 0x11111111;
+      address = 0;
     }
     if (time == 380) dut->go = 0;
 
@@ -60,8 +68,11 @@ int main(int argc, const char ** argv, const char ** env) {
     if (dut->clk && !last_clk && !dut->go) {
       if (dut->done) {
          count++;
-         if (count == 2) break;
-         else (dut->go = 1);
+         if (count == 2) 
+            break;
+         else {
+            dut->go = 1;
+         }
       }
     } else if (dut->clk && !last_clk) {
       dut->go = 0;
