@@ -1,12 +1,9 @@
 On a lab workstation do:
 ```
 make collatz.vcd
-```
-Then:
-```
 gtkwave --save=collatz.gtkw collatz.vcd
 ```
-For ROUNDS = 1, the output on h0-h7 should be:
+For `ROUNDS = 1`, the output on h0-h7 should be:
 ```
 h0 = 0x88a88b84
 h1 = 0x85514c14
@@ -17,7 +14,7 @@ h5 = 0x68aaa824
 h6 = 0x3dce9376
 h7 = 0xf8524d39
 ```
-For ROUNDS = 7, the output on h0-h7 should be:
+For `ROUNDS = 7`, the output on h0-h7 should be:
 ```
 h0 = 0xa010b16b
 h1 = 0x4a185174
