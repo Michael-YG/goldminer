@@ -29,6 +29,7 @@ int main(int argc, const char ** argv, const char ** env) {
   bool last_clk = true;
   int time;
   int data = 0x00000000;
+  unsigned count = 0;
   for (time = 0 ; time < 10000 ; time += 10) {
     dut->clk = ((time % 20) >= 10) ? 1 : 0; // Simulate a 50 MHz clock
     if (time == 0) {
@@ -57,7 +58,13 @@ int main(int argc, const char ** argv, const char ** env) {
     tfp->dump(time); // Write the VCD file for this cycle
 
     if (dut->clk && !last_clk && !dut->go) {
-      if (dut->done) break; // Stop once "done" appears
+      if (dut->done) {
+         count++;
+         if (count == 2) break;
+         else (dut->go = 1);
+      }
+    } else if (dut->clk && !last_clk) {
+      dut->go = 0;
     }
     last_clk = dut->clk;
   }

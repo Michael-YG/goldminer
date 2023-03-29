@@ -126,7 +126,9 @@ module collatz(
                h7 <= h7 + h;
                running <= 0;
                done <= 1;
+               counter <= 0;
             end else begin
+               done <= 0;
                // eventually does out of bound accesses,
                // nothing wrong in behavioral simulation thus far
                message_schedule[counter + 16] <= expand();
@@ -138,10 +140,11 @@ module collatz(
                c <= b;
                b <= a;
                a <= temp1() + temp2();
+               counter <= counter + 1;
             end
-            counter <= counter + 1;
-         end else
+         end else begin
             counter <= counter;
+         end
       end
    end
 endmodule
