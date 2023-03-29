@@ -57,8 +57,10 @@ module collatz(
    endfunction
   
    function logic [31:0] expand();
-      expand = message_schedule[counter] + sig0(message_schedule[counter + 1])
-                + message_schedule[counter + 9] + sig1(message_schedule[counter + 14]);
+      expand =    message_schedule     [counter     ]
+                + sig0(message_schedule[counter +  1])
+                + message_schedule     [counter +  9]
+                + sig1(message_schedule[counter + 14]);
    endfunction
 
    function logic [31:0] ch();
