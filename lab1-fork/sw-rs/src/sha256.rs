@@ -6,6 +6,8 @@ extern crate test;
 use std::num::Wrapping;
 use std::ops::Shr;
 
+const ROUNDS: u32 = 7;
+
 #[allow(dead_code)]
 pub fn say_hi() {
     println!("mod sha256 says hi!");
@@ -36,23 +38,33 @@ pub fn get_hash(bytes: &[u8]) -> String {
     let mut h6 = H6;
     let mut h7 = H7;
 
-    let mut pointer = 0;
-
-//	while pointer < vec.len() {
+    //let mut pointer = 0;
+    //	while pointer < vec.len() {
+    let mut data = 0x00000000u32;
+    for _ in 0..ROUNDS {
         // ********** PART 1 ************ //
 
         let mut message_schedule = [Wrapping(0u32); 64];
 
-/*
-        for (i, byte) in vec[pointer..pointer + 64].iter().enumerate() {
-            message_schedule[i / 4].0 |= (*byte as u32) << (3 - (i % 4)) * 8;
-        }
-*/
-		let mut data = 0x00000000u32;
+        /*
+                        for (i, byte) in vec[pointer..pointer + 64].iter().enumerate() {
+                            message_schedule[i / 4].0 |= (*byte as u32) << (3 - (i % 4)) * 8;
+                        }
+        */
         for i in 0..16 {
-			data = if data == 0xffffffff { 0x00000000 } else { data + 0x11111111 };
+            data = if data == 0xffffffff {
+                0x00000000
+            } else {
+                data + 0x11111111
+            };
             message_schedule[i] = Wrapping(data);
         }
+        data = if data == 0xffffffff {
+            0x00000000
+        } else {
+            data + 0x11111111
+        };
+        //print_schedule(&message_schedule);
 
         for i in 16..64 {
             let sigma_0 = sigma_0(message_schedule[i - 15]);
@@ -60,7 +72,6 @@ pub fn get_hash(bytes: &[u8]) -> String {
             message_schedule[i] =
                 message_schedule[i - 16] + sigma_0 + message_schedule[i - 7] + sigma_1;
         }
-        //print_schedule(&message_schedule);
 
         // ********** PART 2 ************ //
 
@@ -98,8 +109,8 @@ pub fn get_hash(bytes: &[u8]) -> String {
         h6 += g;
         h7 += h;
 
-        pointer += 64;
-//    }
+        //pointer += 64;
+    }
 
     format!(
         "{:0>8x} {:0>8x} {:0>8x} {:0>8x} {:0>8x} {:0>8x} {:0>8x} {:0>8x}",
@@ -114,7 +125,10 @@ mod tests {
 
     #[test]
     fn single_message() {
-        assert_eq!("9fcef88ccb42a5170778e1febe81d7875d501f042e83266c0e2f05315a0c6f77", get_hash("My name is Jules!".as_bytes()));
+        assert_eq!(
+            "9fcef88ccb42a5170778e1febe81d7875d501f042e83266c0e2f05315a0c6f77",
+            get_hash("My name is Jules!".as_bytes())
+        );
     }
 
     #[bench]
