@@ -109,6 +109,7 @@ module collatz(
       if (go) begin
          message_schedule[15:0] <= input_words[15:0];
          running <= 1;
+         done <= 0;
          a <= h0;
          b <= h1;
          c <= h2;
@@ -132,7 +133,6 @@ module collatz(
                done <= 1;
                counter <= 0;
             end else begin
-               done <= 0;
                // eventually does out of bound accesses,
                // nothing wrong in behavioral simulation thus far
                message_schedule[counter + 16] <= expand();
