@@ -38,13 +38,20 @@ pub fn get_hash(bytes: &[u8]) -> String {
 
     let mut pointer = 0;
 
-    while pointer < vec.len() {
+//	while pointer < vec.len() {
         // ********** PART 1 ************ //
 
         let mut message_schedule = [Wrapping(0u32); 64];
 
+/*
         for (i, byte) in vec[pointer..pointer + 64].iter().enumerate() {
             message_schedule[i / 4].0 |= (*byte as u32) << (3 - (i % 4)) * 8;
+        }
+*/
+		let mut data = 0x00000000u32;
+        for i in 0..16 {
+			data = if data == 0xffffffff { 0x00000000 } else { data + 0x11111111 };
+            message_schedule[i] = Wrapping(data);
         }
 
         for i in 16..64 {
@@ -92,10 +99,10 @@ pub fn get_hash(bytes: &[u8]) -> String {
         h7 += h;
 
         pointer += 64;
-    }
+//    }
 
     format!(
-        "{:0>8x}{:0>8x}{:0>8x}{:0>8x}{:0>8x}{:0>8x}{:0>8x}{:0>8x}",
+        "{:0>8x} {:0>8x} {:0>8x} {:0>8x} {:0>8x} {:0>8x} {:0>8x} {:0>8x}",
         h0, h1, h2, h3, h4, h5, h6, h7
     )
 }
@@ -162,11 +169,11 @@ fn print_message_block(x: &Vec<u8>) {
 }
 
 #[allow(dead_code)]
-fn print_schedule(x: &[u32]) {
+fn print_schedule(x: &[Wrapping<u32>]) {
     for i in 0..x.len() {
         print!("w");
         print!("{:<3}", i);
-        println!("{:0>32b}", x[i]);
+        println!("{:0>8x}", x[i]);
     }
 }
 

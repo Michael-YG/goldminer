@@ -24,3 +24,9 @@ collatz.sv   // DUT
 collatz.gtkw // Waveform settings
 sw-rs        // Rust software implementation
 ```
+To get golden outputs from rust implementation:
+```
+Install rust on your machine
+cd sw-rs
+cargo run
+```
