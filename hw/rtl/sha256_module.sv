@@ -1,7 +1,7 @@
 `timescale 1ns/1ps
 
 `include "sha256_incl.svh"
-`define OPTIMIZE
+//`define OPTIMIZE
 
 module sha256_module (
     input clk, reset, start,
@@ -10,62 +10,6 @@ module sha256_module (
     output logic done
 );
 
-function logic [31:0] rotL(input [31:0] a, input [5:0] b);
-    rotL = (a << b) | (a >> (32 - b));
-endfunction
-
-function logic [31:0] rotR(input [31:0] a, input [5:0] b);
-    rotR = (a >> b) | (a << (32 - b));
-endfunction
-
-// ch function
-//function logic [31:0] ch(input [31:0] x,y,z);
-//    ch = (x & y) ^ ((~x) & z);
-//endfunction
-module ch (input [31:0] x,y,z, output [31:0] ch);
-    assign ch = (x & y) ^ ((~x) & z);
-endmodule
-//// maj function
-//function logic [31:0] maj(input [31:0] x,y,z)
-//    maj = (z & y) ^ (x & z) ^ (y & z);
-//endfunction
-
-module maj (input [31:0] x,y,z, output [31:0] maj);
-    assign maj = (x & y) ^ (x & z) ^ (y & z);
-endmodule
-//// epsilone0 function
-//function logic [31:0] ep0(input [31:0] x)
-//    // ep0 = (x >> 2) ^ (x >> 13) ^ (x >> 22);
-//    ep0 = {{2{1'b0}},x[31:2]} ^ {{13{1'b0}},x[31:13]} ^ {{22{1'b0}},x[31:22]};
-//endfunction
-module ep0 (input [31:0] x, output [31:0] ep0);
-    assign ep0 = rotR(x,2) ^ rotR(x,13) ^ rotR(x,22);
-endmodule
-//// epsilone1 function
-//function loigc [31:0] ep1(input [31:0] x)
-//    // ep1 = (x >> 6) ^ (x >> 11) ^ (x >> 25);
-//    ep1 = {{6{1'b0},x[31:6]}} ^ {{11{1'b0},x[31:11]}} ^ {{25{1'b0},x[31:25]}};
-//endfunction
-module ep1 (input [31:0] x, output [31:0] ep1);
-    assign ep1 = rotR(x,6) ^ rotR(x,11) ^ rotR(x,25);
-endmodule
-//function logic [31:0] sig0(input [31:0] x)
-//    // sigma0 = (x >> 7) ^ (x >> 18) ^ (x >> 3);
-//    sig0 = {{7{1'b0}},x[31:7]} ^ {{18{1'b0}},x[31:18]} ^ {{3{1'b0}},x[31:3]};
-//endfunction
-module sig0(input [31:0] x, output [31:0] sig0);
-    assign sig0 = rotR(x,7) ^ rotR(x,18) ^ ({{3{1'b0}},x[31:3]});
-endmodule
-//function logic [31:0] sig1(input [31:0] x)
-//    // sigma1 = (x >> 17) ^ (x >> 19) ^ (x >> 10);
-//    sig1 = {{17{1'b0}},x[31:17]} ^ {{19{1'b0}},x[31:19]} ^ {{10{1'b0}},x[31:10]};
-//endfunction
-module sig1(input [31:0] x, output [31:0] sig1);
-    assign sig1 = rotR(x,17) ^ rotR(x,19) ^ ({{10{1'b0}},x[31:10]});
-endmodule
-
-// enum int unsigned { S0 = , S1 = 1} state, next_state;
-// logic [31:0] mem_k [0:63];
 
 localparam [31:0] mem_k [0:63] = {
 	32'h428a2f98,32'h71374491,32'hb5c0fbcf,32'he9b5dba5,32'h3956c25b,32'h59f111f1,32'h923f82a4,32'hab1c5ed5,
@@ -81,8 +25,6 @@ localparam [31:0] mem_k [0:63] = {
 logic [31:0] mem_m [0:63];
 logic [31:0] a,b,c,d,e,f,g,h;
 logic [5:0] cnt_0,cnt_2;
-// logic [7:0] cnt_1;
-// logic [6:0] cnt;
 logic [31:0] data_0,data_1,data_2,data_3;
 
 // counter for word expansion
@@ -95,10 +37,9 @@ always_ff @ (posedge clk) begin
             cnt_0 <= cnt_0 + 1;
         end
         else begin 
-            cnt_0 <= cnt_0 == 0? 0 :( cnt_0 == 63? cnt_0:cnt_0 + 1);
+            cnt_0 <= cnt_0 == 0?cnt_0:(cnt_0 == 63?cnt_0:cnt_0 + 1);
         end
 end
-
 logic [31:0] sig1_next_0;
 logic [31:0] sig0_next_0;
 logic [11:0] address;
@@ -124,7 +65,7 @@ end
 always_ff @ (posedge clk) begin
     if (reset) cnt_2 <= 0;
     else
-        if(start) cnt_2 <= 0;
+        if(cnt_0 == 0) cnt_2 <= 0;
         else 
             if (cnt_0==1) cnt_2 <= cnt_2+1;
             else cnt_2 <= cnt_2 == 0? 0 : (cnt_2 == 63? cnt_2:cnt_2 + 1);
@@ -132,12 +73,12 @@ end
 
 logic [31:0] ep0_next,ep1_next,ch_next_0,maj_next_0;
 logic [31:0] t1,t2;
+
 ep0 ep0_0(.x(a),.ep0(ep0_next));
 ep1 ep1_0(.x(e),.ep1(ep1_next));
 ch ch_0(.x(e),.y(f),.z(g),.ch(ch_next_0));
 maj maj_0(.x(a),.y(b),.z(c),.maj(maj_next_0));
-// assign t1 = h + sig1(e) + ch(e,f,g) + mem_k[cnt_2] + mem_m[cnt_2];
-// assign t2 = sig0(a) + maj(a,b,c);
+
 assign t1 = h + ep1_next + ch_next_0 + mem_k[cnt_2] + mem_m[cnt_2];
 assign t2 = ep0_next + maj_next_0;
 
@@ -200,14 +141,44 @@ always_ff @ (posedge clk) begin
     end
 end
 
-//logic done_next;
 always_ff@(posedge clk)
     if(reset) begin 
-//        done_next <= 0;
         done <= 0;
     end else begin
-//        done_next <= cnt_2 == 63;
         if(start) done <= 0;
         else done <= cnt_2 == 63;
     end
 endmodule
+
+function logic [31:0] rotL(input [31:0] a, input [5:0] b);
+    rotL = (a << b) | (a >> (32 - b));
+endfunction
+
+function logic [31:0] rotR(input [31:0] a, input [5:0] b);
+    rotR = (a >> b) | (a << (32 - b));
+endfunction
+
+module ch (input [31:0] x,y,z, output [31:0] ch);
+    assign ch = (x & y) ^ ((~x) & z);
+endmodule
+
+module maj (input [31:0] x,y,z, output [31:0] maj);
+    assign maj = (x & y) ^ (x & z) ^ (y & z);
+endmodule
+
+module ep0 (input [31:0] x, output [31:0] ep0);
+    assign ep0 = rotR(x,2) ^ rotR(x,13) ^ rotR(x,22);
+endmodule
+
+module ep1 (input [31:0] x, output [31:0] ep1);
+    assign ep1 = rotR(x,6) ^ rotR(x,11) ^ rotR(x,25);
+endmodule
+
+module sig0(input [31:0] x, output [31:0] sig0);
+    assign sig0 = rotR(x,7) ^ rotR(x,18) ^ ({{3{1'b0}},x[31:3]});
+endmodule
+
+module sig1(input [31:0] x, output [31:0] sig1);
+    assign sig1 = rotR(x,17) ^ rotR(x,19) ^ ({{10{1'b0}},x[31:10]});
+endmodule
+
