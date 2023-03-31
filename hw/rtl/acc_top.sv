@@ -9,10 +9,11 @@ module acc_top(
     output logic [3:0] writeaddress
 );
 
-logic [512:0] buf;
-logic [2:0] cnt;
+logic [512:0] buffer;
+logic [3:0] cnt;
 logic [255:0] hashvalue;
-logic done,start,outputdone,finish;
+// logic finish;
+logic done,start,outputdone;
 enum int unsigned {st_idle = 0, st_load = 1, st_exe = 2, st_send = 3} state, state_next;
 
 /* FSM logic */
@@ -34,79 +35,86 @@ end
 logic loading;
 assign loading = chipselect && write;
 
-logic [31:0] control_data;
+logic [31:0] control_buf;
 
 always_ff @ (posedge clk) begin
-    if (reset)  buf <= 0;
+    if (reset)  buffer <= 0;
     else
         if(loading)
             case(address)
-                0: buf[31:0] <= writedata;
-                1: buf[63:32] <= writedata;
-                2: buf[95:64] <= writedata;
-                3: buf[127:96] <= writedata;
-                4: buf[159:128] <= writedata;
-                5: buf[191:160] <= writedata;
-                6: buf[223:192] <= writedata;
-                7: buf[255:224] <= writedata;
-                8: buf[287:256] <= writedata;
-                9: buf[319:288] <= writedata;
-                10: buf[351:320] <= writedata;
-                11: buf[383:352] <= writedata;
-                12: buf[415:384] <= writedata;
-                13: buf[447:416] <= writedata;
-                14: buf[479:448] <= writedata;
-                15: buf[511:480] <= writedata;
+                0: buffer[31:0] <= writedata;
+                1: buffer[63:32] <= writedata;
+                2: buffer[95:64] <= writedata;
+                3: buffer[127:96] <= writedata;
+                4: buffer[159:128] <= writedata;
+                5: buffer[191:160] <= writedata;
+                6: buffer[223:192] <= writedata;
+                7: buffer[255:224] <= writedata;
+                8: buffer[287:256] <= writedata;
+                9: buffer[319:288] <= writedata;
+                10: buffer[351:320] <= writedata;
+                11: buffer[383:352] <= writedata;
+                12: buffer[415:384] <= writedata;
+                13: buffer[447:416] <= writedata;
+                14: buffer[479:448] <= writedata;
+                15: buffer[511:480] <= writedata;
             endcase
 end
 
 always_ff @ (posedge clk)
-    if (reset) control_data <= 0;
-    else control_data <= address[4] && loading? writedata : 0;
+    if (reset) control_buf <= 0;
+    else control_buf <= address[4] && loading? writedata : 0;
 
-assign start = control_data == 32'hffffffff;
+assign start = control_buf == 32'hffffffff;
 
 /* Sending logic */
+
 always_ff @ (posedge clk)
     if (reset) cnt <= 0;
-    else cnt <= cnt + (state == st_send);
+    else 
+        if(cnt == 8)
+            cnt <= hash_ack? 0 : cnt;
+        else
+            cnt <= cnt + (state == st_send);
 
+// logic outputdone_reg;
 assign outputdone = cnt == 7;
-logic outputdone_reg;
-always_ff @ (posedge clk)
-    if (reset) outputdone_reg <= 0;
-    else outputdone_reg <= outputdone;
+// always_ff @ (posedge clk)
+    // if (reset) outputdone_reg <= 0;
+    // else outputdone_reg <= outputdone;
+logic hash_ack;
+assign hash_ack = control_buf == 32'h11111111; // handshake
 
-assign finish = outputdone_reg && !outputdone;
+
+// assign finish = outputdone_reg && !outputdone;
 
 always_ff @ (posedge clk)
     if (reset) 
         {writeaddress,data_out} <= 0;
     else 
-        if(finish)
-            case(cnt)
-                0: {writeaddress,data_out} <= {{1'b0,cnt},hashvalue[31:0]};
-                1: {writeaddress,data_out} <= {{1'b0,cnt},hashvalue[63:32]};
-                2: {writeaddress,data_out} <= {{1'b0,cnt},hashvalue[95:64]};
-                3: {writeaddress,data_out} <= {{1'b0,cnt},hashvalue[127:96]};
-                4: {writeaddress,data_out} <= {{1'b0,cnt},hashvalue[159:128]};
-                5: {writeaddress,data_out} <= {{1'b0,cnt},hashvalue[191:160]};
-                6: {writeaddress,data_out} <= {{1'b0,cnt},hashvalue[223:192]};
-                7: {writeaddress,data_out} <= {{1'b0,cnt},hashvalue[255:224]};
-            endcase
-        else
-            {writeaddress,data_out} <= {4'b1000,32'hffffffff};
-
+        // if(finish | !hash_ack)
+            // {writeaddress,data_out} <= {4'b1000,32'hffffffff};
+        case(cnt)
+            0: {writeaddress,data_out} <= {{1'b0,cnt},hashvalue[31:0]};
+            1: {writeaddress,data_out} <= {{1'b0,cnt},hashvalue[63:32]};
+            2: {writeaddress,data_out} <= {{1'b0,cnt},hashvalue[95:64]};
+            3: {writeaddress,data_out} <= {{1'b0,cnt},hashvalue[127:96]};
+            4: {writeaddress,data_out} <= {{1'b0,cnt},hashvalue[159:128]};
+            5: {writeaddress,data_out} <= {{1'b0,cnt},hashvalue[191:160]};
+            6: {writeaddress,data_out} <= {{1'b0,cnt},hashvalue[223:192]};
+            7: {writeaddress,data_out} <= {{1'b0,cnt},hashvalue[255:224]};
+            8: {writeaddress,data_out} <= {4'b1000,32'hffffffff};
+        endcase
 
 /**** Module ports map ****/
 sha256_module sha256_module_0(
     .clk(clk),
     .reset(reset),
     .start(start),
-    .data_in(buf),
+    .data_in(buffer),
     .data_out(hashvalue),
     .done(done)
-)
+);
 /**************************/
 
 endmodule
