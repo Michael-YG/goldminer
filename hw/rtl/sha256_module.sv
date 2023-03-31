@@ -152,7 +152,7 @@ always_ff @(posedge clk)
 //         else done <= cnt_2 == 63;
 //     end
 
-always_ff @(posedge clk)
+always_ff @ (posedge clk)
     done <= !cnt_2is63 && cnt_2is63next;
 
 endmodule

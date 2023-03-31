@@ -1,50 +1,43 @@
 /*
 * Avalon memory-mapped SHA256 accelerator
 */
-
 module acc_top(
     input clk,reset,write,chipselect,
     input [4:0] address, // hash input value 0-31 and start flag 32
     input [31:0] writedata,
     output logic [31:0] data_out,
-    output logic [6:0] writeaddress
-    // output logic valid
+    output logic [3:0] writeaddress
 );
 
 logic [512:0] buf;
-logic [5:0] cnt;
+logic [2:0] cnt;
 logic [255:0] hashvalue;
-logic done;
-enum int unsigned {st_idle = 0, st_load = 1, st_exe = 2} state, state_next;
+logic done,start,outputdone,finish;
+enum int unsigned {st_idle = 0, st_load = 1, st_exe = 2, st_send = 3} state, state_next;
 
 /* FSM logic */
 always_ff @ (posedge clk)
     if (reset) state <= st_idle;
     else state <= state_next;
-logic start;
+
 always_comb begin
     state_next = state;
     case(state)
         st_idle: state_next = loading? st_load:state;
         st_load: state_next = start? st_exe:state;
-        st_exe: state_next = hashdone? st_idle:state;
+        st_exe: state_next = done? st_send:state;
+        st_send: state_next = outputdone? st_idle:state;
     endcase
 end
 
 /* Counter and buffer loading logic */
-logic loading, hashdone;
+logic loading;
 assign loading = chipselect && write;
-
-always_ff @ (posedge clk)
-    if (reset) cnt <= 0;
-    else cnt <= cnt == 31? cnt:cnt + loading;
 
 logic [31:0] control_data;
 
 always_ff @ (posedge clk) begin
-    if (reset)
-        buf <= 0;
-    // else buf[buf_addr+31:buf_addr] <= writedata;
+    if (reset)  buf <= 0;
     else
         if(loading)
             case(address)
@@ -73,13 +66,38 @@ always_ff @ (posedge clk)
 
 assign start = control_data == 32'hffffffff;
 
-logic stateisexe,stateisexe_next;
-assign stateisexe_next = state == st_exe;
+/* Sending logic */
+always_ff @ (posedge clk)
+    if (reset) cnt <= 0;
+    else cnt <= cnt + (state == st_send);
+
+assign outputdone = cnt == 7;
+logic outputdone_reg;
+always_ff @ (posedge clk)
+    if (reset) outputdone_reg <= 0;
+    else outputdone_reg <= outputdone;
+
+assign finish = outputdone_reg && !outputdone;
 
 always_ff @ (posedge clk)
-    // if(reset) state_reg <= 0
-    stateisexe <= stateisexe_next;
- 
+    if (reset) 
+        {writeaddress,data_out} <= 0;
+    else 
+        if(finish)
+            case(cnt)
+                0: {writeaddress,data_out} <= {{1'b0,cnt},hashvalue[31:0]};
+                1: {writeaddress,data_out} <= {{1'b0,cnt},hashvalue[63:32]};
+                2: {writeaddress,data_out} <= {{1'b0,cnt},hashvalue[95:64]};
+                3: {writeaddress,data_out} <= {{1'b0,cnt},hashvalue[127:96]};
+                4: {writeaddress,data_out} <= {{1'b0,cnt},hashvalue[159:128]};
+                5: {writeaddress,data_out} <= {{1'b0,cnt},hashvalue[191:160]};
+                6: {writeaddress,data_out} <= {{1'b0,cnt},hashvalue[223:192]};
+                7: {writeaddress,data_out} <= {{1'b0,cnt},hashvalue[255:224]};
+            endcase
+        else
+            {writeaddress,data_out} <= {4'b1000,32'hffffffff};
+
+
 /**** Module ports map ****/
 sha256_module sha256_module_0(
     .clk(clk),
