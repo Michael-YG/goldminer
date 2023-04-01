@@ -27,78 +27,58 @@ int main(int argc, const char ** argv, const char ** env) {
 
   // Initial values
   
-  dut->go = 0;
   dut->write = 0;
+  dut->read = 0;
   dut->chipselect = 0;
 
-  bool last_clk = true;
-  bool launched = false;
-  int time;
+  int time = 0;
   unsigned data = 0x00000000;
-  unsigned count = 0;
-  unsigned write_start_time = WRITE_OFFSET;
   unsigned address = 0;
-  for (time = 0 ; time < 10000 ; time += 10) {
-    dut->clk = ((time % 20) >= 10) ? 1 : 0; // Simulate a 50 MHz clock
-    if (time == 0) {
-      dut->reset = 1;
-    }
+  unsigned results[8];
 
-    if (time >= write_start_time && time < write_start_time + WRITE_PERIOD) {
-      dut->reset = 0;
-      dut->write = 1;
-      dut->chipselect = 1;
+  for (int k=0; k<ROUNDS; k++) {
+     address = 0;
+     for (int localtime=0; localtime < 20+WRITE_PERIOD; localtime+=10,time+=10){
+       dut->clk = ((time % 20) >= 10) ? 1 : 0; // Simulate a 50 MHz clock
 
-      if (time%20 == 0) {
-        data = data == 0xffffffff ? 0x00000000 : data + 0x11111111;
-        dut->address = address;
-        dut->writedata = data;
-        address++;
-      }
-    } else {
-      dut->write = 0;
-      dut->chipselect = 0;
-      address = 0;
-    }
+       if (localtime >= 0 && localtime < 20 && k==0)
+         dut->reset = 1;
+       else {
+         dut->reset = 0;
+         dut->write = 1;
+         dut->chipselect = 1;
+       }
 
-    if (time == WRITE_OFFSET + WRITE_PERIOD + 40) {
-      dut->go = 1;
-      launched = true;
-      write_start_time = time + WRITE_OFFSET;
-      data = data == 0xffffffff ? 0x00000000 : data + 0x11111111;
-    }
-
-    dut->eval();     // Run the simulation for a cycle
-    tfp->dump(time); // Write the VCD file for this cycle
-
-    if (dut->clk && !last_clk && !dut->go) {
-      if (dut->done && launched) {
-         count++;
-         if (count == ROUNDS)
-            break;
-         else {
-            dut->go = 1;
-            if (time % 20 == 0)
-               write_start_time = time + WRITE_OFFSET;
-            else
-               write_start_time = time + WRITE_OFFSET + 10;
+       if (localtime >= 20 && localtime < 20 + WRITE_PERIOD) {
+         if (time % 20 == 0) {
             data = data == 0xffffffff ? 0x00000000 : data + 0x11111111;
+            dut->writedata = data;
+            dut->address = address;
+            address++;
          }
-      }
-    } else if (dut->clk && !last_clk) {
-      dut->go = 0;
-    }
-    last_clk = dut->clk;
+       }
+
+       dut->eval();     // Run the simulation for a cycle
+       tfp->dump(time); // Write the VCD file for this cycle
+     }
+     data += 0x11111111;
+
+     dut->write = 0;
+     dut->read = 1;
+     dut->address = 31;
+     while (!dut->readdata) {
+       dut->clk = ((time % 20) >= 10) ? 1 : 0; // Simulate a 50 MHz clock
+       dut->eval();     // Run the simulation for a cycle
+       tfp->dump(time); // Write the VCD file for this cycle
+       time += 10;
+     }
   }
 
   address = 16;
-  unsigned results[8];
-  for (int k = 0 ; k < 17 ; k++, time += 10) {
+  for (int k = 0 ; k < 9 ; time += 10) {
     dut->clk = ((time % 20) >= 10) ? 1 : 0;
-    dut->eval();
-    tfp->dump(time);
 
-    if (time%20 != 0) { // why does this now change on posedge ?
+    if (time%20 == 0) {
        dut->chipselect = 1;
        dut->read = 1;
        dut->address = address;
@@ -106,14 +86,18 @@ int main(int argc, const char ** argv, const char ** env) {
          results[address-17] = dut->readdata;
        }
        address++;
+       k++;
     }
+
+    dut->eval();
+    tfp->dump(time);
   }
-  
+
   // Run a few more clock cycles
   for (int k = 0 ; k < 4 ; k++, time += 10) {
     dut->clk = ((time % 20) >= 10) ? 1 : 0;
-      dut->eval();
-      tfp->dump(time);
+    dut->eval();
+    tfp->dump(time);
   }
   
   tfp->close(); // Stop dumping the VCD file

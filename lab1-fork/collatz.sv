@@ -1,20 +1,22 @@
 module collatz(
       input logic         clk,      // Clock
       input logic         reset,
-      input logic         go,       // Start sha256 round
       input logic  [31:0] writedata,
       input logic         write,
-      output logic        waitrequest,
       input               chipselect,
       input logic  [4:0]  address,
       input logic         read,
-      output logic [31:0] readdata,
-      output logic        done);    // True when sha256 round is done
+      output logic [31:0] readdata);
 
       logic [63:0][31:0] message_schedule;
       logic [7:0] counter;
       logic [31:0] a, b, c, d, e, f, g, h;
-      logic [31:0] h0, h1, h2, h3, h4, h5, h6, h7;
+      logic [31:0] h0, h1, h2, h3, h4, h5, h6, h7, done = 1;
+
+      logic go;
+
+      /* verilator lint_off UNUSED */
+      logic [31:0] trash;
       /* verilator lint_off UNUSED */
       bit debug;
    
@@ -87,7 +89,8 @@ module collatz(
       if (reset) begin
          counter <= 0;
          done <= 1;
-         readdata <= 32'h6a09e667;
+         go <= 0;
+         readdata <= 0;
          h0 <= 32'h6a09e667;
          h1 <= 32'hbb67ae85;
          h2 <= 32'h3c6ef372;
@@ -97,11 +100,35 @@ module collatz(
          h6 <= 32'h1f83d9ab;
          h7 <= 32'h5be0cd19;
       end
+   end
 
-      if (chipselect && write && !waitrequest) begin
-         message_schedule[address] <= writedata;
+   always_ff @(posedge clk) begin
+      if (chipselect && write) begin
+         case (address)
+            5'h0: message_schedule[0] <= writedata;
+            5'h1: message_schedule[1] <= writedata; 
+            5'h2: message_schedule[2] <= writedata;
+            5'h3: message_schedule[3] <= writedata;
+            5'h4: message_schedule[4] <= writedata;
+            5'h5: message_schedule[5] <= writedata;
+            5'h6: message_schedule[6] <= writedata;
+            5'h7: message_schedule[7] <= writedata;
+            5'h8: message_schedule[8] <= writedata;
+            5'h9: message_schedule[9] <= writedata; 
+            5'ha: message_schedule[10] <= writedata;
+            5'hb: message_schedule[11] <= writedata;
+            5'hc: message_schedule[12] <= writedata;
+            5'hd: message_schedule[13] <= writedata;
+            5'he: message_schedule[14] <= writedata;
+            5'hf: message_schedule[15] <= writedata;
+            default: trash <= writedata;
+         endcase
+         go <= 1;
+         done <= 0;
       end
+   end
 
+   always_ff @(posedge clk) begin
       if (chipselect && read) begin
          case (address)
             5'h10: readdata <= h0;
@@ -112,22 +139,26 @@ module collatz(
             5'h15: readdata <= h5;
             5'h16: readdata <= h6;
             5'h17: readdata <= h7;
-            default: readdata <= h0;
+            5'h1f: readdata <= done;
+            default: readdata <= done;
          endcase
       end
+   end
 
-      if (go) begin
-         done <= 0;
-         a <= h0;
-         b <= h1;
-         c <= h2;
-         d <= h3;
-         e <= h4;
-         f <= h5;
-         g <= h6;
-         h <= h7;
-      end else begin
-         if (!done) begin
+   always_ff @(posedge clk) begin
+      if (!write) begin
+         if (go) begin
+            go <= 0;
+            counter <= 0;
+            a <= h0;
+            b <= h1;
+            c <= h2;
+            d <= h3;
+            e <= h4;
+            f <= h5;
+            g <= h6;
+            h <= h7;
+         end else if (!|done) begin
             if (counter[6]) begin
                h0 <= h0 + a;
                h1 <= h1 + b;
@@ -155,7 +186,5 @@ module collatz(
          end
       end
    end
-
 assign debug = !&counter[5:4];
-assign waitrequest = reset || (!done && !|counter[7:4]);
 endmodule
