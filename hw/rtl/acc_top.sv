@@ -13,7 +13,7 @@ logic [512:0] buffer;
 logic [3:0] cnt;
 logic [255:0] hashvalue;
 // logic finish;
-logic done,start,outputdone;
+logic done,start,outputdone,loading;
 enum int unsigned {st_idle = 0, st_load = 1, st_exe = 2, st_send = 3} state, state_next;
 
 /* FSM logic */
@@ -32,7 +32,6 @@ always_comb begin
 end
 
 /* Counter and buffer loading logic */
-logic loading;
 assign loading = chipselect && write;
 
 logic [31:0] control_buf;
