@@ -93,7 +93,6 @@ int main(int argc, const char ** argv, const char ** env) {
 
   address = 16;
   unsigned results[8];
-  // Once "done" is received, run a few more clock cycles
   for (int k = 0 ; k < 17 ; k++, time += 10) {
     dut->clk = ((time % 20) >= 10) ? 1 : 0;
     dut->eval();
@@ -110,6 +109,7 @@ int main(int argc, const char ** argv, const char ** env) {
     }
   }
   
+  // Run a few more clock cycles
   for (int k = 0 ; k < 4 ; k++, time += 10) {
     dut->clk = ((time % 20) >= 10) ? 1 : 0;
       dut->eval();
