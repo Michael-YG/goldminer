@@ -3,8 +3,8 @@
 #include <verilated.h>
 #include <verilated_vcd_c.h>
 
-const unsigned ROUNDS = 7;
-const unsigned WRITE_OFFSET = 100;
+const unsigned ROUNDS = 3;
+const unsigned WRITE_OFFSET = 500;
 // Do not change - its 16 input words * (20 ns / (1 input word write))
 const unsigned WRITE_PERIOD = 320;
 

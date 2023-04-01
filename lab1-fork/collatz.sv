@@ -14,6 +14,7 @@ module collatz(
       output logic [31:0] h5,       // h5
       output logic [31:0] h6,       // h6
       output logic [31:0] h7,       // h7
+// can only pass 32 bits at a time to pass to processor. use readdata and data to get back to software.
       output logic        done);    // True when sha256 round is done
 
       logic [15:0][31:0] input_words;
@@ -22,8 +23,13 @@ module collatz(
       logic [7:0] counter;
 
       logic [31:0] a, b, c, d, e, f, g, h;
+
+      /* verilator lint_off UNUSED */
+      bit debug;
    
       /* verilator lint_off LITENDIAN */
+// make sure that it turns into a blockram
+// it has to take one cycle - take in the address, one cycle later get the data.
       localparam [0:63][31:0] k_words = '{
          32'h428a2f98,32'h71374491,32'hb5c0fbcf,32'he9b5dba5,
          32'h3956c25b,32'h59f111f1,32'h923f82a4,32'hab1c5ed5,
@@ -106,6 +112,7 @@ module collatz(
       end
 
       if (go) begin
+         // Will not compile well.
          message_schedule[15:0] <= input_words[15:0];
          done <= 0;
          a <= h0;
@@ -118,7 +125,7 @@ module collatz(
          h <= h7;
       end else begin
          if (!done) begin
-            if (counter == 64) begin
+            if (counter[6]) begin
                h0 <= h0 + a;
                h1 <= h1 + b;
                h2 <= h2 + c;
@@ -130,9 +137,8 @@ module collatz(
                done <= 1;
                counter <= 0;
             end else begin
-               // eventually does out of bound accesses,
-               // nothing wrong in behavioral simulation thus far
-               message_schedule[counter + 16] <= expand();
+               if (!&counter[5:4])
+                  message_schedule[counter + 16] <= expand();
                h <= g;
                g <= f;
                f <= e;
@@ -146,4 +152,6 @@ module collatz(
          end
       end
    end
+
+assign debug = !&counter[5:4];
 endmodule

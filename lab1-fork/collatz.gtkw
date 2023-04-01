@@ -1,10 +1,10 @@
 [*]
 [*] GTKWave Analyzer v3.3.61 (w)1999-2014 BSI
-[*] Wed Mar 29 04:01:30 2023
+[*] Sat Apr  1 15:49:25 2023
 [*]
 [dumpfile] "/homes/user/stud/fall22/jgc2158/goldminer/lab1-fork/collatz.vcd"
-[dumpfile_mtime] "Wed Mar 29 04:01:01 2023"
-[dumpfile_size] 333798
+[dumpfile_mtime] "Sat Apr  1 15:49:08 2023"
+[dumpfile_size] 506734
 [savefile] "/homes/user/stud/fall22/jgc2158/goldminer/lab1-fork/collatz.gtkw"
 [timestart] 1391
 [size] 2560 1337
@@ -2430,6 +2430,6 @@ TOP.done
 @200
 -w[48:63]
 @28
-TOP.collatz.running
+TOP.collatz.debug
 [pattern_trace] 1
 [pattern_trace] 0
