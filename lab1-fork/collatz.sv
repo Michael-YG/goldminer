@@ -17,7 +17,6 @@ module collatz(
 // can only pass 32 bits at a time to pass to processor. use readdata and data to get back to software.
       output logic        done);    // True when sha256 round is done
 
-      logic [15:0][31:0] input_words;
       logic [63:0][31:0] message_schedule;
       
       logic [7:0] counter;
@@ -95,7 +94,6 @@ module collatz(
    always_ff @(posedge clk) begin
       if (reset) begin
          counter <= 0;
-         input_words <= 0;
          done <= 1;
          h0 <= 32'h6a09e667;
          h1 <= 32'hbb67ae85;
@@ -108,12 +106,10 @@ module collatz(
       end
 
       if (chipselect && write) begin
-         input_words[address] <= writedata;
+         message_schedule[address] <= writedata;
       end
 
       if (go) begin
-         // Will not compile well.
-         message_schedule[15:0] <= input_words[15:0];
          done <= 0;
          a <= h0;
          b <= h1;
