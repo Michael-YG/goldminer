@@ -74,7 +74,7 @@ int main(int argc, const char ** argv, const char ** env) {
     if (dut->clk && !last_clk && !dut->go) {
       if (dut->done && launched) {
          count++;
-         if (count == ROUNDS) 
+         if (count == ROUNDS)
             break;
          else {
             dut->go = 1;
@@ -91,7 +91,24 @@ int main(int argc, const char ** argv, const char ** env) {
     last_clk = dut->clk;
   }
 
+  address = 16;
+  unsigned results[8];
   // Once "done" is received, run a few more clock cycles
+  for (int k = 0 ; k < 17 ; k++, time += 10) {
+    dut->clk = ((time % 20) >= 10) ? 1 : 0;
+    dut->eval();
+    tfp->dump(time);
+
+    if (time%20 != 0) { // why does this now change on posedge ?
+       dut->chipselect = 1;
+       dut->read = 1;
+       dut->address = address;
+       if (k != 0) {
+         results[address-17] = dut->readdata;
+       }
+       address++;
+    }
+  }
   
   for (int k = 0 ; k < 4 ; k++, time += 10) {
     dut->clk = ((time % 20) >= 10) ? 1 : 0;
@@ -104,6 +121,16 @@ int main(int argc, const char ** argv, const char ** env) {
 
   dut->final(); // Stop the simulation
   delete dut;
+
+  unsigned golden[8] = {0x20178e07, 0x0c6ae70f, 0xb41a5e91, 0x36076c58,
+                         0xd27c7765, 0x7ebffa22, 0xdb7a862a, 0x988199bc,};
+  bool pass = true;
+  for (int i = 0; i<8; i++) {
+      if (results[i] != golden[i])
+         pass = false;
+  } 
+  if (pass) std::cout << "PASS" << std::endl;
+  else std::cout << "FAIL" << std::endl;
 
   return 0;
 }
