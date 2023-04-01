@@ -4,6 +4,7 @@ module collatz(
       input logic         go,       // Start sha256 round
       input logic  [31:0] writedata,
       input logic         write,
+      output logic        waitrequest,
       input               chipselect,
       input logic  [3:0]  address,
       output logic [31:0] h0,       // h0
@@ -105,7 +106,7 @@ module collatz(
          h7 <= 32'h5be0cd19;
       end
 
-      if (chipselect && write) begin
+      if (chipselect && write && !waitrequest) begin
          message_schedule[address] <= writedata;
       end
 
@@ -150,4 +151,5 @@ module collatz(
    end
 
 assign debug = !&counter[5:4];
+assign waitrequest = reset || (!done && !|counter[7:4]);
 endmodule
