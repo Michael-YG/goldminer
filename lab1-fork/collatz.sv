@@ -6,24 +6,15 @@ module collatz(
       input logic         write,
       output logic        waitrequest,
       input               chipselect,
-      input logic  [3:0]  address,
-      output logic [31:0] h0,       // h0
-      output logic [31:0] h1,       // h1
-      output logic [31:0] h2,       // h2
-      output logic [31:0] h3,       // h3
-      output logic [31:0] h4,       // h4
-      output logic [31:0] h5,       // h5
-      output logic [31:0] h6,       // h6
-      output logic [31:0] h7,       // h7
-// can only pass 32 bits at a time to pass to processor. use readdata and data to get back to software.
+      input logic  [4:0]  address,
+      input logic         read,
+      output logic [31:0] readdata,
       output logic        done);    // True when sha256 round is done
 
       logic [63:0][31:0] message_schedule;
-      
       logic [7:0] counter;
-
       logic [31:0] a, b, c, d, e, f, g, h;
-
+      logic [31:0] h0, h1, h2, h3, h4, h5, h6, h7;
       /* verilator lint_off UNUSED */
       bit debug;
    
@@ -96,6 +87,7 @@ module collatz(
       if (reset) begin
          counter <= 0;
          done <= 1;
+         readdata <= 32'h6a09e667;
          h0 <= 32'h6a09e667;
          h1 <= 32'hbb67ae85;
          h2 <= 32'h3c6ef372;
@@ -108,6 +100,20 @@ module collatz(
 
       if (chipselect && write && !waitrequest) begin
          message_schedule[address] <= writedata;
+      end
+
+      if (chipselect && read) begin
+         case (address)
+            5'h10: readdata <= h0;
+            5'h11: readdata <= h1;
+            5'h12: readdata <= h2;
+            5'h13: readdata <= h3;
+            5'h14: readdata <= h4;
+            5'h15: readdata <= h5;
+            5'h16: readdata <= h6;
+            5'h17: readdata <= h7;
+            default: readdata <= h0;
+         endcase
       end
 
       if (go) begin
