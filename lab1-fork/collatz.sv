@@ -115,7 +115,7 @@ module collatz(
             f <= h5;
             g <= h6;
             h <= h7;
-         end else if (!|done) begin
+         end else if (!(|done)) begin
             if (counter[6]) begin
                h0 <= h0 + a;
                h1 <= h1 + b;
@@ -128,7 +128,7 @@ module collatz(
                done <= 1;
                counter <= 0;
             end else begin
-               if (!&counter[5:4])
+               if (!(&counter[5:4]))
                   message_schedule[counter + 16] <= expand;
                h <= g;
                g <= f;
