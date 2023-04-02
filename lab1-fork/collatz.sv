@@ -12,13 +12,13 @@ module collatz(
       logic [7:0] counter;
       logic [31:0] a, b, c, d, e, f, g, h;
       logic [31:0] h0, h1, h2, h3, h4, h5, h6, h7, done = 1;
-
       logic go;
 
       /* verilator lint_off UNUSED */
       logic [31:0] trash;
-      /* verilator lint_off UNUSED */
-      bit debug;
+
+      logic[31:0] sig0, sig1, expand;
+      logic[31:0] ch, ep0, ep1, maj, temp1, temp2;
    
       /* verilator lint_off LITENDIAN */
 // make sure that it turns into a blockram
@@ -41,49 +41,6 @@ module collatz(
          32'h748f82ee,32'h78a5636f,32'h84c87814,32'h8cc70208,
          32'h90befffa,32'ha4506ceb,32'hbef9a3f7,32'hc67178f2
       };
-
-   function logic [31:0] rot_r(input [31:0] x, input [8:0] shift);
-      rot_r = (x >> shift) | (x << (32 - shift));
-   endfunction
-
-   function logic [31:0] sig0(input [31:0] x);
-      sig0 = rot_r(x, 7) ^ rot_r(x, 18) ^ (x >> 3);
-   endfunction
-
-   function logic [31:0] sig1(input [31:0] x);
-      sig1 = rot_r(x, 17) ^ rot_r(x, 19) ^ (x >> 10);
-   endfunction
-  
-   function logic [31:0] expand();
-      expand =    message_schedule     [counter     ]
-                + sig0(message_schedule[counter +  1])
-                + message_schedule     [counter +  9]
-                + sig1(message_schedule[counter + 14]);
-   endfunction
-
-   function logic [31:0] ch();
-      ch = (e & f) ^ ((~e) & g);
-   endfunction
-
-   function logic [31:0] ep0();
-      ep0 = rot_r(a, 2) ^ rot_r(a, 13) ^ rot_r(a, 22);
-   endfunction
-
-   function logic [31:0] ep1();
-      ep1 = rot_r(e, 6) ^ rot_r(e, 11) ^ rot_r(e, 25);
-   endfunction
-
-   function logic [31:0] maj();
-      maj = (a & b) ^ (a & c) ^ (b & c);
-   endfunction
-
-   function logic [31:0] temp1();
-      temp1 = h + ep1() + ch() + k_words[counter] + message_schedule[counter];
-   endfunction
-
-   function logic [31:0] temp2();
-      temp2 = ep0() + maj();
-   endfunction
 
    always_ff @(posedge clk) begin
       if (reset) begin
@@ -172,19 +129,38 @@ module collatz(
                counter <= 0;
             end else begin
                if (!&counter[5:4])
-                  message_schedule[counter + 16] <= expand();
+                  message_schedule[counter + 16] <= expand;
                h <= g;
                g <= f;
                f <= e;
-               e <= d + temp1();
+               e <= d + temp1;
                d <= c;
                c <= b;
                b <= a;
-               a <= temp1() + temp2();
+               a <= temp1 + temp2;
                counter <= counter + 1;
             end
          end
       end
    end
-assign debug = !&counter[5:4];
+
+   function logic [31:0] rot_r(input [31:0] x, input [8:0] shift);
+      rot_r = x >> shift | x << 32 - shift;
+   endfunction
+
+   assign sig0 = rot_r(message_schedule[counter +  1], 7)
+        ^ rot_r(message_schedule[counter +  1], 18)
+        ^ message_schedule[counter +  1] >> 3;
+   assign sig1 = rot_r(message_schedule[counter + 14], 17)
+        ^ rot_r(message_schedule[counter + 14], 19)
+        ^ message_schedule[counter + 14] >> 10;
+   assign expand = message_schedule[counter] + sig0
+          + message_schedule[counter + 9] + sig1;
+
+   assign ch = e & f ^ ~e & g;
+   assign ep0 = rot_r(a, 2) ^ rot_r(a, 13) ^ rot_r(a, 22);
+   assign ep1 = rot_r(e, 6) ^ rot_r(e, 11) ^ rot_r(e, 25);
+   assign maj = a & b ^ a & c ^ b & c;
+   assign temp1 = h + ep1 + ch + k_words[counter] + message_schedule[counter];
+   assign temp2 = ep0 + maj;
 endmodule
