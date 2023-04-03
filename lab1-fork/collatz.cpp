@@ -6,7 +6,7 @@
 const unsigned ROUNDS = 3;
 const unsigned WRITE_OFFSET = 500;
 // Do not change - its 16 input words * (20 ns / (1 input word write))
-const unsigned WRITE_PERIOD = 320;
+const unsigned WRITE_PERIOD = 640;
 
 int main(int argc, const char ** argv, const char ** env) {
   Verilated::commandArgs(argc, argv);
@@ -45,17 +45,19 @@ int main(int argc, const char ** argv, const char ** env) {
          dut->reset = 1;
        else {
          dut->reset = 0;
-         dut->write = 1;
          dut->read = 0;
          dut->chipselect = 1;
        }
 
        if (localtime >= 20 && localtime < 20 + WRITE_PERIOD) {
-         if (time % 20 == 0) {
+         if (time % 40 == 0) {
             data = data == 0xffffffff ? 0x00000000 : data + 0x11111111;
+            dut->write = 1;
             dut->writedata = data;
             dut->address = address;
             address++;
+         } else if (time % 20 == 0) {
+            dut->write = 0;
          }
        }
 
