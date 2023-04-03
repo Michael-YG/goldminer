@@ -57,9 +57,7 @@ module collatz(
          h6 <= 32'h1f83d9ab;
          h7 <= 32'h5be0cd19;
       end
-   end
 
-   always_ff @(posedge clk) begin
       if (chipselect && write) begin
          case (address)
             5'h0: message_schedule[0] <= writedata;
@@ -77,15 +75,17 @@ module collatz(
             5'hc: message_schedule[12] <= writedata;
             5'hd: message_schedule[13] <= writedata;
             5'he: message_schedule[14] <= writedata;
-            5'hf: message_schedule[15] <= writedata;
+            5'hf:
+            begin
+                  message_schedule[15] <= writedata;
+                  go <= 1;
+                  done <= 0;
+            end
             default: trash <= writedata;
          endcase
-         go <= 1;
-         done <= 0;
+         readdata <= 0;
       end
-   end
 
-   always_ff @(posedge clk) begin
       if (chipselect && read) begin
          case (address)
             5'h10: readdata <= h0;
@@ -97,12 +97,10 @@ module collatz(
             5'h16: readdata <= h6;
             5'h17: readdata <= h7;
             5'h1f: readdata <= done;
-            default: readdata <= done;
+            default: readdata <= 0;
          endcase
       end
-   end
 
-   always_ff @(posedge clk) begin
       if (!write) begin
          if (go) begin
             go <= 0;

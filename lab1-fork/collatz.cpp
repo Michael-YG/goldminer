@@ -46,6 +46,7 @@ int main(int argc, const char ** argv, const char ** env) {
        else {
          dut->reset = 0;
          dut->write = 1;
+         dut->read = 0;
          dut->chipselect = 1;
        }
 
