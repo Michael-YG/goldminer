@@ -38,7 +38,7 @@ module simple_sha256_tb();
 	parameter [255:0] tb_0_result = 256'h80cab0c8ef5701aed57f628fd04511fd4f2040ba721acb80c48650a4677f47be;
 
 	
-	acc_top acc_top_0(
+	acc acc_0(
 		.clk(clk),
 		.reset(reset),
 		.write(write),
