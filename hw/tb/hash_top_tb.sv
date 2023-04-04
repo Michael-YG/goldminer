@@ -10,9 +10,32 @@ module simple_sha256_tb();
 	logic [255:0]		bitcoin_output, test_output;
 
 	logic [31:0]		data_out;
-	logic [8:0]		writeaddress;
+	logic [3:0]		writeaddress;
 
 	integer i;
+
+	// Binary input: 000000000000000000000000110111000000000000000000000000000000000000110010001110011011010101000000001100110011100110110010001100110011000010110011001100100011100110110011001101011011001000111001101101011011001000111001101101010011100110110000101101010011001100110011001101010011001000110101101101010011000010110101101101100011000010110011001101011011001000110101101100100011100110110101001110011011000010110101001100110011001000111001101100001011001
+	parameter [32:0] mem_tb_0 [0:15] = {
+		{32'b00000000000000000000000011011100},
+		{32'b00000000000000000000000000000000},
+		{32'b00110010001110011011010101000000},
+		{32'b00110011001110011011001000110011},
+		{32'b00110000101100110011001000111001},
+		{32'b10110011001101011011001000111001},
+		{32'b10110101101100100011100110110101},
+		{32'b00111001101100001011010100110011},
+		{32'b00110011001101010011001000110101},
+		{32'b10110101001100001011010110110110},
+		{32'b00110000101100110011010110110010},
+		{32'b00110101101100100011100110110101},
+		{32'b00111001101100001011010100110011},
+		{32'b00110010001110011011000010110011},
+		{32'b00000000000000000000000000000000},
+		{32'b00000000000000000000000110111111}
+	};
+
+
+	parameter [255:0] tb_0_result = 256'h80cab0c8ef5701aed57f628fd04511fd4f2040ba721acb80c48650a4677f47be;
 
 	
 	acc_top acc_top_0(
@@ -25,7 +48,6 @@ module simple_sha256_tb();
 		.data_out(data_out),
 		.writeaddress(writeaddress));
 	
-
 	always begin
 		`HALF_CLOCK_PERIOD;
 		clk = ~clk;
@@ -39,71 +61,67 @@ module simple_sha256_tb();
 		writedata = 32'b0;
 		write = 0;
 	
-		test_output = 256'h2a19f8a396959e87a0607a7eae4abb941135e49b8d342e7bb923a7ca33b09ff7;
+		test_output = tb_0_result;
 
-		#10
+		#40
 		// read data
 		reset = 0;
+		#20
 		write = 1;
 		address = 0;
-		writedata = 32'b00000001000000000000000000000000;
+		writedata = mem_tb_0[address];
 		#20	// read next data
 		address = 1;
-		writedata = 32'b10010101000000001100010000111010;
+		writedata = mem_tb_0[address];
 		#20	// read next data
 		address = 2;
-		writedata = 32'b00100101110001100010010001010010;
+		writedata = mem_tb_0[address];
 		#20	// read next data
 		address = 3;
-		writedata = 32'b00001011010100010000000010101101;
+		writedata = mem_tb_0[address];
 		#20	// read next data
 		address = 4;
-		writedata = 32'b11111000001011001011100111111001;
+		writedata = mem_tb_0[address];
 		#20	// read next data
 		address = 5;
-		writedata = 32'b11011010011100101111110100100100;
+		writedata = mem_tb_0[address];
 		#20	// read next data
 		address = 6;
-		writedata = 32'b01000111101001001001011010111100;
+		writedata = mem_tb_0[address];
 		#20	// read next data
 		address = 7;
-		writedata = 32'b01100000000010110000000000000000;
+		writedata = mem_tb_0[address];
 		#20	// read next data
 		address = 8;
-		writedata = 32'b00000000000000000000000000000000;
+		writedata = mem_tb_0[address];
 		#20	// read next data
 		address = 9;
-		writedata = 32'b01101100110110000110001000110111;
+		writedata = mem_tb_0[address];
 		#20	// read next data
 		address = 10;
-		writedata = 32'b00000011100101011101111011011111;
+		writedata = mem_tb_0[address];
 		#20	// read next data
 		address = 11;
-		writedata = 32'b00011101101000101000010000011100;
+		writedata = mem_tb_0[address];
 		#20	// read next data
 		address = 12;
-		writedata = 32'b11001101101000001111110001001000;
+		writedata = mem_tb_0[address];
 		#20	// read next data
 		address = 13;
-		writedata = 32'b10011110001100000011100111011110;
+		writedata = mem_tb_0[address];
 		#20	// read next data
 		address = 14;
-		writedata = 32'b01011111000111001100110111011110;
+		writedata = mem_tb_0[address];
 		#20	// read final data
 		address = 15;
-		writedata = 32'b11110000111010000011010010011001;
-		
+		writedata = mem_tb_0[address];
 		#20	// drive start = 1
 		address = 16;
 		writedata = 32'hffffffff;
 		// start sha256
-		#10
+		#20
 		write = 0;	// drive start = 0
-		#10
-		#1280	// 64+1 clk cycles
-		
-		
+		#1280;	// 64+1 clk cycles
 
-		
 	end
 endmodule

@@ -67,7 +67,6 @@ always_ff @ (posedge clk)
 assign start = control_buf == 32'hffffffff;
 
 /* Sending logic */
-
 always_ff @ (posedge clk)
     if (reset) cnt <= 0;
     else 
@@ -82,11 +81,10 @@ assign outputdone = cnt == 7;
     // if (reset) outputdone_reg <= 0;
     // else outputdone_reg <= outputdone;
 logic hash_ack;
-assign hash_ack = control_buf == 32'h11111111; // handshake
+assign hash_ack = control_buf == 32'h0f0f0f0f; // handshake ack from sw, received when hash value is sent to sw part
 
 
 // assign finish = outputdone_reg && !outputdone;
-
 always_ff @ (posedge clk)
     if (reset) 
         {writeaddress,data_out} <= 0;

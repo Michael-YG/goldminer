@@ -25,7 +25,7 @@ localparam [31:0] mem_k [0:63] = {
 logic [31:0] mem_m [0:63];
 logic [31:0] a,b,c,d,e,f,g,h;
 logic [5:0] cnt_0,cnt_2;
-logic [31:0] data_0,data_1,data_2,data_3;
+// logic [31:0] data_0,data_1,data_2,data_3;
 
 // counter for word expansion
 always_ff @ (posedge clk) begin
