@@ -127,15 +127,7 @@ always_ff @ (posedge clk) begin
            data_out[191:160] <= c+data_out[191:160];
            data_out[223:192] <= b+data_out[223:192];
            data_out[255:224] <= a+data_out[255:224];
-            // data_out[255:224] <= a+`SHA256_H0;
-            // data_out[223:192] <= b+`SHA256_H1;
-            // data_out[191:160] <= c+`SHA256_H2;
-            // data_out[159:128] <= d+`SHA256_H3;
-            // data_out[127:96] <= e+`SHA256_H4;
-            // data_out[95:64] <= f+`SHA256_H5;
-            // data_out[63:32] <= g+`SHA256_H6;
-            // data_out[31:0] <= h+`SHA256_H7;
-        end
+        end 
     end
 end
 logic cnt_2is63,cnt_2is63next;

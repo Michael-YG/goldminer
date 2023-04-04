@@ -58,16 +58,16 @@ module simple_sha256_tb();
 		clk = 0;
 		chipselect = 1;
 		address = 0;
-		writedata = 32'b0;
+		writedata = mem_tb_0[0];
 		write = 0;
 	
 		test_output = tb_0_result;
 
-		#40
+		#50
 		// read data
 		reset = 0;
-		#20
 		write = 1;
+		#60
 		address = 0;
 		writedata = mem_tb_0[address];
 		#20	// read next data

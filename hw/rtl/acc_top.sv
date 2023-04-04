@@ -9,11 +9,11 @@ module acc_top(
     output logic [3:0] writeaddress
 );
 
-logic [512:0] buffer;
+logic [511:0] buffer;
 logic [3:0] cnt;
 logic [255:0] hashvalue;
 // logic finish;
-logic done,start,outputdone,loading;
+logic done,start,outputdone,loading,hash_ack;
 enum int unsigned {st_idle = 0, st_load = 1, st_exe = 2, st_send = 3} state, state_next;
 
 /* FSM logic */
@@ -80,7 +80,6 @@ assign outputdone = cnt == 7;
 // always_ff @ (posedge clk)
     // if (reset) outputdone_reg <= 0;
     // else outputdone_reg <= outputdone;
-logic hash_ack;
 assign hash_ack = control_buf == 32'h0f0f0f0f; // handshake ack from sw, received when hash value is sent to sw part
 
 
