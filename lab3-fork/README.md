@@ -38,3 +38,7 @@ insmod vga_ball.ko
 ```
 
 You should see `PASS` on your screen.
+
+Todo:
+- [ ] Perform a reset from software.
+- [ ] Reproduce on another fpga following exactly these instructions.
