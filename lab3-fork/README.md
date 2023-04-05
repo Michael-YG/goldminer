@@ -15,7 +15,12 @@ make qsys-clean && make qsys && make quartus && make rbf && make dtb
 ```
 Everything should complete with no problems.
 
-Then upload the files below to the `/mnt` folder on the fpga. Reboot the fpga.
+Then upload the files below to the `/mnt` folder on the fpga.
+```
+./soc_system.dtb
+./output_files/soc_system.rbf
+```
+Reboot the fpga.
 
 Next, in the software folder replace the following files with the ones in this
 directory.
