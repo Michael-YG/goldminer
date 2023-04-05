@@ -6,7 +6,7 @@ extern crate test;
 use std::num::Wrapping;
 use std::ops::Shr;
 
-const ROUNDS: u32 = 7;
+//const ROUNDS: u32 = 3;
 
 #[allow(dead_code)]
 pub fn say_hi() {
@@ -38,32 +38,37 @@ pub fn get_hash(bytes: &[u8]) -> String {
     let mut h6 = H6;
     let mut h7 = H7;
 
-    //let mut pointer = 0;
-    //	while pointer < vec.len() {
-    let mut data = 0x00000000u32;
-    for _ in 0..ROUNDS {
+    let mut pointer = 0;
+    while pointer < vec.len() {
+    //for _ in 0..ROUNDS {
         // ********** PART 1 ************ //
 
         let mut message_schedule = [Wrapping(0u32); 64];
 
-        /*
-                        for (i, byte) in vec[pointer..pointer + 64].iter().enumerate() {
-                            message_schedule[i / 4].0 |= (*byte as u32) << (3 - (i % 4)) * 8;
-                        }
-        */
-        for i in 0..16 {
-            data = if data == 0xffffffff {
-                0x00000000
-            } else {
-                data + 0x11111111
-            };
-            message_schedule[i] = Wrapping(data);
+        for (i, byte) in vec[pointer..pointer + 64].iter().enumerate() {
+            message_schedule[i / 4].0 |= (*byte as u32) << (3 - (i % 4)) * 8;
         }
-        data = if data == 0xffffffff {
-            0x00000000
-        } else {
-            data + 0x11111111
-        };
+        /*
+        message_schedule[0]  = Wrapping(0x5e824e54u32);
+        message_schedule[1]  = Wrapping(0xfe9dd9c5u32);
+        message_schedule[2]  = Wrapping(0x968697c0u32);
+        message_schedule[3]  = Wrapping(0xd3b72297u32);
+
+        message_schedule[4]  = Wrapping(0x6349fa44u32);
+        message_schedule[5]  = Wrapping(0xd5abe17fu32);
+        message_schedule[6]  = Wrapping(0xae68fd79u32);
+        message_schedule[7]  = Wrapping(0x511e972au32);
+
+        message_schedule[8]  = Wrapping(0xb64b80c8u32);
+        message_schedule[9]  = Wrapping(0x6ae5422fu32);
+        message_schedule[10] = Wrapping(0xaa4dcc23u32);
+        message_schedule[11] = Wrapping(0x77f7aa64u32);
+
+        message_schedule[12] = Wrapping(0x7f27019du32);
+        message_schedule[13] = Wrapping(0x14bcd278u32);
+        message_schedule[14] = Wrapping(0xac411c94u32);
+        message_schedule[15] = Wrapping(0x5f0909fau32);
+        */
         //print_schedule(&message_schedule);
 
         for i in 16..64 {
@@ -109,11 +114,12 @@ pub fn get_hash(bytes: &[u8]) -> String {
         h6 += g;
         h7 += h;
 
-        //pointer += 64;
+        pointer += 64;
     }
 
     format!(
-        "{:0>8x} {:0>8x} {:0>8x} {:0>8x} {:0>8x} {:0>8x} {:0>8x} {:0>8x}",
+        //"{:0>8x} {:0>8x} {:0>8x} {:0>8x} {:0>8x} {:0>8x} {:0>8x} {:0>8x}",
+        "{:0>8x}{:0>8x}{:0>8x}{:0>8x}{:0>8x}{:0>8x}{:0>8x}{:0>8x}",
         h0, h1, h2, h3, h4, h5, h6, h7
     )
 }
