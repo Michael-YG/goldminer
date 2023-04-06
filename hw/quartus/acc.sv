@@ -5,7 +5,7 @@ module acc_top(
     input clk,reset,write,chipselect,
     input [4:0] address, // hash input value 0-31 and start flag 32
     input [31:0] writedata,
-    output logic [31:0] data_out,
+    output logic [31:0] data_out
 //    output logic [3:0] writeaddress
 );
 logic [3:0] writeaddress = address[3:0];
