@@ -43,7 +43,9 @@ TARFILES = Makefile \
 	$(BOARD_INFO) \
 	ip/intr_capturer/intr_capturer.v \
 	ip/intr_capturer/intr_capturer_hw.tcl \
-	vga_ball.sv
+	acc.sv \
+	sha256_module.sv\
+	sha256_incl.svh
 
 TARFILE = lab3-hw.tar.gz
 

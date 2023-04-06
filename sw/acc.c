@@ -218,5 +218,5 @@ module init(acc_init);
 module exit(acc_exit);
 
 MODULE_LICENSE("GPL");
-MODULE_AUTHOR("Lionel Messi");
-MODULE_DESCRIPTION("CSEE4840 Accelerator Driver");
+MODULE_AUTHOR("mgy");
+MODULE_DESCRIPTION("SHA256 Accelerator Driver");

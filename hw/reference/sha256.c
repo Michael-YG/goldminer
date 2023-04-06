@@ -14,6 +14,7 @@
 
 /*************************** HEADER FILES ***************************/
 #include <stdlib.h>
+#include <stdio.h>
 #include <memory.h>
 #include "sha256.h"
 
@@ -43,6 +44,7 @@ static const WORD k[64] = {
 /*********************** FUNCTION DEFINITIONS ***********************/
 void sha256_transform(SHA256_CTX *ctx, const BYTE data[])
 {
+	// printf("sha256_transform() is invoked\n");
 	WORD a, b, c, d, e, f, g, h, i, j, t1, t2, m[64];
 
 	for (i = 0, j = 0; i < 16; ++i, j += 4)
@@ -98,6 +100,7 @@ void sha256_init(SHA256_CTX *ctx)
 
 void sha256_update(SHA256_CTX *ctx, const BYTE data[], size_t len)
 {
+	// printf("sha256_update() is invoked\n");
 	WORD i;
 
 	for (i = 0; i < len; ++i) {
