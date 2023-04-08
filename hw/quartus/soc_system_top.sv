@@ -175,18 +175,8 @@ module soc_system_top(
  input [7:0]   TD_DATA,
  input 	       TD_HS,
  output        TD_RESET_N,
- input 	       TD_VS,
+ input 	       TD_VS
 
-
- ///////// VGA /////////
- output [7:0]  VGA_B,
- output        VGA_BLANK_N,
- output        VGA_CLK,
- output [7:0]  VGA_G,
- output        VGA_HS,
- output [7:0]  VGA_R,
- output        VGA_SYNC_N,
- output        VGA_VS
 );
 
    soc_system soc_system0(
@@ -314,9 +304,6 @@ module soc_system_top(
 
    assign TD_RESET_N = SW[0];
 
-   assign {VGA_R, VGA_G, VGA_B} = { 24{ SW[0] } };
-   assign {VGA_BLANK_N, VGA_CLK,
-	   VGA_HS, VGA_SYNC_N, VGA_VS} = { 5{ SW[0] } };
 
 							          
 endmodule

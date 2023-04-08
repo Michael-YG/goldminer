@@ -8,7 +8,8 @@ module acc_top(
     output logic [31:0] data_out
 //    output logic [3:0] writeaddress
 );
-logic [3:0] writeaddress = address[3:0];
+logic [3:0] writeaddress;
+assign writeaddress = address[3:0];
 
 logic [511:0] buffer;
 logic [3:0] cnt;
