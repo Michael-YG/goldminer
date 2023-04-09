@@ -86,9 +86,10 @@ always_ff @ (posedge clk)
                 6: data_out <= hashvalue[223:192];
                 7: data_out <= hashvalue[255:224];
                 17: data_out <= 32'hffffffff;
+                default: data_out <= 2;
             endcase
         else
-            data_out <= 0;
+            data_out <= 1;
 
 /**** Module ports map ****/
 sha256_module sha256_module_0(
