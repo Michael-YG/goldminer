@@ -2,7 +2,7 @@
 * Avalon memory-mapped SHA256 accelerator
 */
 module acc_top(
-    input clk,reset,write,chipselect,
+    input clk,reset,write,read,chipselect,
     input [4:0] address, // hash input value 0-31 and start flag 32
     input [31:0] writedata,
     output logic [31:0] data_out
@@ -15,7 +15,7 @@ logic [511:0] buffer;
 logic [3:0] cnt;
 logic [255:0] hashvalue;
 // logic finish;
-logic done,start,loading,hash_ack,acc_reset;
+logic done,start,loading,reading,hash_ack,acc_reset;
 enum int unsigned {st_idle = 0, st_load = 1, st_exe = 2, st_send = 3} state, state_next;
 
 /* FSM logic */
@@ -35,6 +35,7 @@ end
 
 /* Counter and buffer loading logic */
 assign loading = chipselect && write;
+assign reading = chipselect && read;
 
 logic [31:0] control_buf;
 
@@ -64,7 +65,7 @@ end
 
 always_ff @ (posedge clk)
     if (reset) control_buf <= 0;
-    else control_buf <= address==16 && loading? writedata : 0;
+    else control_buf <= address == 16 && loading? writedata : 0;
 
 assign start = control_buf == 32'hffffffff;
 assign acc_reset = (control_buf == 32'hff0000ff) | reset;
@@ -75,7 +76,7 @@ always_ff @ (posedge clk)
     if (reset) 
         data_out <= 0;
     else 
-        if(state == st_send)
+        if(state == st_send && reading)
             case(address)
                 0: data_out <= hashvalue[31:0];
                 1: data_out <= hashvalue[63:32];
@@ -89,7 +90,7 @@ always_ff @ (posedge clk)
                 default: data_out <= 2;
             endcase
         else
-            data_out <= 3;
+            data_out <= 32'h0f0ff0f0;
 
 /**** Module ports map ****/
 sha256_module sha256_module_0(
