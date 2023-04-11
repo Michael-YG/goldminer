@@ -89,7 +89,7 @@ always_ff @ (posedge clk)
                 default: data_out <= 2;
             endcase
         else
-            data_out <= 1;
+            data_out <= 3;
 
 /**** Module ports map ****/
 sha256_module sha256_module_0(
