@@ -86,14 +86,14 @@ always_ff @ (posedge clk)
                 // 5: data_out <= hashvalue[191:160];
                 // 6: data_out <= hashvalue[223:192];
                 // 7: data_out <= hashvalue[255:224];
-                0: data_out <= buffer[31:0];
-                1: data_out <= buffer[63:32];
-                2: data_out <= buffer[95:64];
-                3: data_out <= buffer[127:96];
-                4: data_out <= buffer[159:128];
-                5: data_out <= buffer[191:160];
-                6: data_out <= buffer[223:192];
-                7: data_out <= buffer[255:224];
+                0: data_out <= hashvalue[287:256];
+                1: data_out <= hashvalue[319:288];
+                2: data_out <= hashvalue[351:320];
+                3: data_out <= hashvalue[383:352];  
+                4: data_out <= hashvalue[415:384];
+                5: data_out <= hashvalue[447:416];
+                6: data_out <= hashvalue[479:448];
+                7: data_out <= hashvalue[511:480];
                 17: data_out <= 32'h11111111;
                 default: data_out <= 2;
             endcase
