@@ -1,0 +1,32 @@
+/homes/user/stud/fall22/ms6525/Desktop/goldminer/hw/rtl/acc.sv {1 {vlog -work work -vopt -sv -stats=none /homes/user/stud/fall22/ms6525/Desktop/goldminer/hw/rtl/acc.sv
+QuestaSim vlog 10.7b_1 Compiler 2018.07 Jul 26 2018
+-- Compiling module acc_top
+
+Top level modules:
+	acc_top
+
+} {} {}} /homes/user/stud/fall22/ms6525/Desktop/goldminer/hw/vsim/hash_top_tb.sv {1 {vlog -work work -vopt -sv -stats=none /homes/user/stud/fall22/ms6525/Desktop/goldminer/hw/vsim/hash_top_tb.sv
+QuestaSim vlog 10.7b_1 Compiler 2018.07 Jul 26 2018
+-- Compiling module simple_sha256_tb
+
+Top level modules:
+	simple_sha256_tb
+
+} {} {}} /homes/user/stud/fall22/ms6525/Desktop/goldminer/hw/rtl/sha256_incl.svh {1 {vlog -work work -vopt -sv -stats=none /homes/user/stud/fall22/ms6525/Desktop/goldminer/hw/rtl/sha256_incl.svh
+QuestaSim vlog 10.7b_1 Compiler 2018.07 Jul 26 2018
+
+} {} {}} /homes/user/stud/fall22/ms6525/Desktop/goldminer/hw/rtl/sha256_module.sv {1 {vlog -work work -vopt -sv -stats=none /homes/user/stud/fall22/ms6525/Desktop/goldminer/hw/rtl/sha256_module.sv
+QuestaSim vlog 10.7b_1 Compiler 2018.07 Jul 26 2018
+-- Compiling module sha256_module
+-- Compiling package sha256_module_sv_unit
+-- Compiling module ch
+-- Compiling module maj
+-- Compiling module ep0
+-- Compiling module ep1
+-- Compiling module sig0
+-- Compiling module sig1
+
+Top level modules:
+	sha256_module
+
+} {} {}}

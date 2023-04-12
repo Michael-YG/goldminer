@@ -1,0 +1,259 @@
+m255
+K4
+z2
+13
+!s112 1.1
+!i10d 8192
+!i10e 25
+!i10f 100
+cModel Technology
+d/user/stud/fall22/ms6525/Desktop/CSEE-4823-FINALPROJECT/qsim_dc/alu
+T_opt
+!s110 1681337770
+VE>FDzjgdZlEaRRZ<8o_350
+04 16 4 work simple_sha256_tb fast 0
+=1-54bf6460fb2b-64372daa-74b4a-1819
+o-quiet -auto_acc_if_foreign -work work +acc
+Z0 tCvgOpt 0
+n@_opt
+OE;O;10.7b_1;67
+vacc_top
+Z1 DXx6 sv_std 3 std 0 22 >9az<^>2ff9DAl3OFGaAf1
+Z2 !s110 1681337430
+!i10b 1
+!s100 UHc]8c`I2h2OKS]BVE]ae1
+Ik0X`F93QTm`zkmb8CZ:2j0
+Z3 VDg1SIo80bB@j0V0VzS_@n1
+!s105 acc_sv_unit
+S1
+Z4 d/homes/user/stud/fall22/ms6525/Desktop/goldminer/hw/vsim
+w1681334172
+8/homes/user/stud/fall22/ms6525/Desktop/goldminer/hw/rtl/acc.sv
+F/homes/user/stud/fall22/ms6525/Desktop/goldminer/hw/rtl/acc.sv
+L0 4
+Z5 OE;L;10.7b_1;67
+r1
+!s85 0
+31
+Z6 !s108 1681337430.000000
+!s107 /homes/user/stud/fall22/ms6525/Desktop/goldminer/hw/rtl/acc.sv|
+!s90 -reportprogress|300|-work|work|-vopt|-sv|-stats=none|/homes/user/stud/fall22/ms6525/Desktop/goldminer/hw/rtl/acc.sv|
+!i113 0
+Z7 o-work work -sv -L mtiAvm -L mtiRnm -L mtiOvm -L mtiUvm -L mtiUPF -L infact
+R0
+vch
+R1
+Z8 DXx4 work 21 sha256_module_sv_unit 0 22 BPD`ekLWX5Thzk16Hm;@k3
+R3
+r1
+!s85 0
+!i10b 1
+!s100 e4VG4_cF0KF^1cZgL9T8W2
+Iz^4Ji1^[dDM=:TnZ76fXP3
+Z9 !s105 sha256_module_sv_unit
+S1
+R4
+Z10 w1680981877
+Z11 8/homes/user/stud/fall22/ms6525/Desktop/goldminer/hw/rtl/sha256_module.sv
+Z12 F/homes/user/stud/fall22/ms6525/Desktop/goldminer/hw/rtl/sha256_module.sv
+L0 160
+R5
+31
+R6
+Z13 !s107 /homes/user/stud/fall22/ms6525/Desktop/goldminer/hw/rtl/sha256_incl.svh|/homes/user/stud/fall22/ms6525/Desktop/goldminer/hw/rtl/sha256_module.sv|
+Z14 !s90 -reportprogress|300|-work|work|-vopt|-sv|-stats=none|/homes/user/stud/fall22/ms6525/Desktop/goldminer/hw/rtl/sha256_module.sv|
+!i113 0
+R7
+R0
+vep0
+R1
+R8
+R3
+r1
+!s85 0
+!i10b 1
+!s100 2UehgX24fehc0@O0UOPiV1
+IWCj5W=:MP06e7eLH4;KlR0
+R9
+S1
+R4
+R10
+R11
+R12
+L0 168
+R5
+31
+R6
+R13
+R14
+!i113 0
+R7
+R0
+vep1
+R1
+R8
+R3
+r1
+!s85 0
+!i10b 1
+!s100 6kR?8eK=D=J5LR]_=@jOP3
+I50HD_:d911Z;4eZbQfiVG3
+R9
+S1
+R4
+R10
+R11
+R12
+L0 172
+R5
+31
+R6
+R13
+R14
+!i113 0
+R7
+R0
+vmaj
+R1
+R8
+R3
+r1
+!s85 0
+!i10b 1
+!s100 N6HBGZi=5jg7LPdJDSbg=1
+I59czcWDFLf:zB^K^5Uf[`1
+R9
+S1
+R4
+R10
+R11
+R12
+L0 164
+R5
+31
+R6
+R13
+R14
+!i113 0
+R7
+R0
+vsha256_module
+R1
+R2
+!i10b 1
+!s100 0hdJA5ajVZ61`=bkCI;El0
+ISB:OMKn;nU[5_WFXEDbVV3
+R3
+R9
+S1
+R4
+R10
+R11
+R12
+L0 6
+R5
+r1
+!s85 0
+31
+R6
+R13
+R14
+!i113 0
+R7
+R0
+Xsha256_module_sv_unit
+R1
+VBPD`ekLWX5Thzk16Hm;@k3
+r1
+!s85 0
+!i10b 1
+!s100 TFfi`KF]QhB]=n@D8O_IU0
+IBPD`ekLWX5Thzk16Hm;@k3
+!i103 1
+S1
+R4
+R10
+R11
+R12
+F/homes/user/stud/fall22/ms6525/Desktop/goldminer/hw/rtl/sha256_incl.svh
+L0 152
+R5
+31
+R6
+R13
+R14
+!i113 0
+R7
+R0
+vsig0
+R1
+R8
+R3
+r1
+!s85 0
+!i10b 1
+!s100 QI75h388l_8^Qc`bZzBJC1
+I@99CF^b@?bn<BAQH:FVFY1
+R9
+S1
+R4
+R10
+R11
+R12
+L0 176
+R5
+31
+R6
+R13
+R14
+!i113 0
+R7
+R0
+vsig1
+R1
+R8
+R3
+r1
+!s85 0
+!i10b 1
+!s100 6hU9dCZ2Og_bgikC;Tc<f2
+I^B]ghS:<zI<l?2c9MCI[H2
+R9
+S1
+R4
+R10
+R11
+R12
+L0 180
+R5
+31
+R6
+R13
+R14
+!i113 0
+R7
+R0
+vsimple_sha256_tb
+R1
+!s110 1681337762
+!i10b 1
+!s100 afOKd6fRM8FCXG2kYj4_R2
+I^fiB>AOEdH`6E2EQnzJgX1
+R3
+!s105 hash_top_tb_sv_unit
+S1
+R4
+w1681337756
+8/homes/user/stud/fall22/ms6525/Desktop/goldminer/hw/vsim/hash_top_tb.sv
+F/homes/user/stud/fall22/ms6525/Desktop/goldminer/hw/vsim/hash_top_tb.sv
+L0 4
+R5
+r1
+!s85 0
+31
+!s108 1681337762.000000
+!s107 /homes/user/stud/fall22/ms6525/Desktop/goldminer/hw/vsim/hash_top_tb.sv|
+!s90 -reportprogress|300|-work|work|-vopt|-sv|-stats=none|/homes/user/stud/fall22/ms6525/Desktop/goldminer/hw/vsim/hash_top_tb.sv|
+!i113 0
+R7
+R0

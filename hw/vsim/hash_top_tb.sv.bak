@@ -3,14 +3,14 @@
 
 module simple_sha256_tb();
 
-	logic 			clk, reset, hashdone, chipselect, write;
+	logic 			clk, reset, hashdone, chipselect, write, read;
 	logic [4:0] 		address;
 	logic [31:0]		writedata;
 	logic [511:0]		bitcoin_input, test_input;
 	logic [255:0]		bitcoin_output, test_output;
 
 	logic [31:0]		data_out;
-	logic [3:0]		writeaddress;
+
 
 	integer i;
 
@@ -46,7 +46,7 @@ module simple_sha256_tb();
 		.address(address),
 		.writedata(writedata),
 		.data_out(data_out),
-		.writeaddress(writeaddress));
+		.read(read));
 	
 	always begin
 		`HALF_CLOCK_PERIOD;
@@ -56,6 +56,7 @@ module simple_sha256_tb();
 	initial begin
 		reset = 1;
 		clk = 0;
+		read = 0;
 		chipselect = 1;
 		address = 0;
 		writedata = mem_tb_0[0];
@@ -121,7 +122,10 @@ module simple_sha256_tb();
 		// start sha256
 		#20
 		write = 0;	// drive start = 0
-		#1280;	// 64+1 clk cycles
+		#1400;	// 64+1 clk cycles
+		read = 1;
+		#200;
+$finish
 
 	end
 endmodule
