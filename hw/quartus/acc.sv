@@ -78,22 +78,14 @@ always_ff @ (posedge clk)
     else 
         if(state == st_send && reading)
             case(address)
-                // 0: data_out <= hashvalue[31:0];
-                // 1: data_out <= hashvalue[63:32];
-                // 2: data_out <= hashvalue[95:64];
-                // 3: data_out <= hashvalue[127:96];
-                // 4: data_out <= hashvalue[159:128];
-                // 5: data_out <= hashvalue[191:160];
-                // 6: data_out <= hashvalue[223:192];
-                // 7: data_out <= hashvalue[255:224];
-                0: data_out <= buffer[287:256];
-                1: data_out <= buffer[319:288];
-                2: data_out <= buffer[351:320];
-                3: data_out <= buffer[383:352];  
-                4: data_out <= buffer[415:384];
-                5: data_out <= buffer[447:416];
-                6: data_out <= buffer[479:448];
-                7: data_out <= buffer[511:480];
+                0: data_out <= hashvalue[31:0];
+                1: data_out <= hashvalue[63:32];
+                2: data_out <= hashvalue[95:64];
+                3: data_out <= hashvalue[127:96];
+                4: data_out <= hashvalue[159:128];
+                5: data_out <= hashvalue[191:160];
+                6: data_out <= hashvalue[223:192];
+                7: data_out <= hashvalue[255:224];
                 17: data_out <= 32'h11111111;
                 default: data_out <= 2;
             endcase
