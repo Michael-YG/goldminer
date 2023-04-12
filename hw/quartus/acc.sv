@@ -86,7 +86,7 @@ always_ff @ (posedge clk)
                 5: data_out <= hashvalue[191:160];
                 6: data_out <= hashvalue[223:192];
                 7: data_out <= hashvalue[255:224];
-                17: data_out <= 32'hffffffff;
+                17: data_out <= 32'h11111111;
                 default: data_out <= 2;
             endcase
         else
