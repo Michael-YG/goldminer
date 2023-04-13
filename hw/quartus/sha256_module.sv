@@ -116,24 +116,32 @@ always_ff @ (posedge clk) begin
         data_out[31:0] <= `SHA256_H7;
     end else begin
         if(done) begin
-           data_out[31:0] <= h+data_out[31:0];
-           data_out[63:32] <= g+data_out[63:32];
-           data_out[95:64] <= f+data_out[95:64];
-           data_out[127:96] <= e+data_out[127:96];
-           data_out[159:128] <= d+data_out[159:128];
-           data_out[191:160] <= c+data_out[191:160];
-           data_out[223:192] <= b+data_out[223:192];
+        //    data_out[31:0] <= h+data_out[31:0];
+        //    data_out[63:32] <= g+data_out[63:32];
+        //    data_out[95:64] <= f+data_out[95:64];
+        //    data_out[127:96] <= e+data_out[127:96];
+        //    data_out[159:128] <= d+data_out[159:128];
+        //    data_out[191:160] <= c+data_out[191:160];
+        //    data_out[223:192] <= b+data_out[223:192];
         //    data_out[255:224] <= a+data_out[255:224];
-            data_out[255:224] <= done_cnt;
+            // data_out[255:224] <= done_cnt; appears to be 0
+            data_out[31:0] <= data_out[31:0];
+            data_out[63:32] <= data_out[63:32];
+            data_out[95:64] <= data_out[95:64];
+            data_out[127:96] <= data_out[127:96];
+            data_out[159:128] <= d;
+            data_out[191:160] <= c;
+            data_out[223:192] <= b;
+            data_out[255:224] <= data_out[255:224];
         end 
     end
 end
 
-logic [31:0] done_cnt;
-always @ (posedge clk) begin
-    if(reset) done_cnt <= 0;
-    else done_cnt <= done_cnt + done;
-end
+// logic [31:0] done_cnt;
+// always @ (posedge clk) begin
+//     if(reset) done_cnt <= 0;
+//     else done_cnt <= done_cnt + done;
+// end
 
 logic cnt_2is63,cnt_2is63next;
 assign cnt_2is63next = cnt_2==63;
