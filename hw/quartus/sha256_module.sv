@@ -119,16 +119,14 @@ always_ff @ (posedge clk) begin
         data_out[31:0] <= `SHA256_H7;
     end else begin
         if(done) begin
-        //    data_out[31:0] <= h+data_out[31:0];
-           data_out[31:0] <= 32'h12345678;
+           data_out[31:0] <= h+data_out[31:0];
            data_out[63:32] <= g+data_out[63:32];
            data_out[95:64] <= f+data_out[95:64];
            data_out[127:96] <= e+data_out[127:96];
            data_out[159:128] <= d+data_out[159:128];
            data_out[191:160] <= c+data_out[191:160];
            data_out[223:192] <= b+data_out[223:192];
-        //    data_out[255:224] <= a+data_out[255:224];
-           data_out[255:224] <= 8'h87654321;
+           data_out[255:224] <= a+data_out[255:224];
         end 
     end
 end
@@ -138,16 +136,12 @@ always_ff @(posedge clk)
     if(reset) cnt_2is63 <= 0;
     else cnt_2is63 <= cnt_2is63next;
 
-// always_ff@(posedge clk)
-//     if(reset) begin 
-//         done <= 0;
-//     end else begin
-//         if(start) done <= 0;
-//         else done <= cnt_2 == 63;
-//     end
+logic done_next;
 
-always_ff @ (posedge clk)
-    done <= !cnt_2is63 && cnt_2is63next;
+always_ff @ (posedge clk) begin
+    done_next <= !cnt_2is63 && cnt_2is63next;
+    done <= done_next;
+end
 
 endmodule
 
