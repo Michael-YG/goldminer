@@ -1,7 +1,6 @@
 `timescale 1ns/1ps
 
 `include "sha256_incl.svh"
-//`define OPTIMIZE
 
 module sha256_module (
     input clk, reset, start,
@@ -9,7 +8,6 @@ module sha256_module (
     output logic [255:0] data_out,
     output logic done
 );
-
 
 localparam [0:63] [31:0] mem_k = '{
 	32'h428a2f98,32'h71374491,32'hb5c0fbcf,32'he9b5dba5,32'h3956c25b,32'h59f111f1,32'h923f82a4,32'hab1c5ed5,
@@ -25,7 +23,6 @@ localparam [0:63] [31:0] mem_k = '{
 logic [31:0] mem_m [0:63];
 logic [31:0] a,b,c,d,e,f,g,h;
 logic [5:0] cnt_0,cnt_2;
-// logic [31:0] data_0,data_1,data_2,data_3;
 
 // counter for word expansion
 always_ff @ (posedge clk) begin
@@ -126,10 +123,18 @@ always_ff @ (posedge clk) begin
            data_out[159:128] <= d+data_out[159:128];
            data_out[191:160] <= c+data_out[191:160];
            data_out[223:192] <= b+data_out[223:192];
-           data_out[255:224] <= a+data_out[255:224];
+        //    data_out[255:224] <= a+data_out[255:224];
+            data_out[255:224] <= done_cnt;
         end 
     end
 end
+
+logic [31:0] done_cnt;
+always @ (posedge clk) begin
+    if(reset) done_cnt <= 0;
+    else done_cnt <= done_cnt + done;
+end
+
 logic cnt_2is63,cnt_2is63next;
 assign cnt_2is63next = cnt_2==63;
 always_ff @(posedge clk)
@@ -138,12 +143,9 @@ always_ff @(posedge clk)
 
 // logic done_next;
 
-assign done = !cnt_2is63 && cnt_2is63next;
-
-// always_ff @ (posedge clk) begin
-//     done_next <= !cnt_2is63 && cnt_2is63next;
-//     done <= done_next;
-// end
+always_ff @ (posedge clk) begin
+    done <= !cnt_2is63 && cnt_2is63next;
+end
 
 endmodule
 
@@ -178,4 +180,3 @@ endmodule
 module sig1(input [31:0] x, output [31:0] sig1);
     assign sig1 = rotR(x,17) ^ rotR(x,19) ^ ({{10{1'b0}},x[31:10]});
 endmodule
-
