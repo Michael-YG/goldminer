@@ -136,12 +136,14 @@ always_ff @(posedge clk)
     if(reset) cnt_2is63 <= 0;
     else cnt_2is63 <= cnt_2is63next;
 
-logic done_next;
+// logic done_next;
 
-always_ff @ (posedge clk) begin
-    done_next <= !cnt_2is63 && cnt_2is63next;
-    done <= done_next;
-end
+assign done = !cnt_2is63 && cnt_2is63next;
+
+// always_ff @ (posedge clk) begin
+//     done_next <= !cnt_2is63 && cnt_2is63next;
+//     done <= done_next;
+// end
 
 endmodule
 
