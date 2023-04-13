@@ -116,23 +116,33 @@ always_ff @ (posedge clk) begin
         data_out[31:0] <= `SHA256_H7;
     end else begin
         if(done) begin
-        //    data_out[31:0] <= h+data_out[31:0];
-        //    data_out[63:32] <= g+data_out[63:32];
-        //    data_out[95:64] <= f+data_out[95:64];
-        //    data_out[127:96] <= e+data_out[127:96];
-        //    data_out[159:128] <= d+data_out[159:128];
-        //    data_out[191:160] <= c+data_out[191:160];
-        //    data_out[223:192] <= b+data_out[223:192];
-        //    data_out[255:224] <= a+data_out[255:224];
+            data_out[31:0] <= mem_m[0];
+            data_out[63:32] <= mem_m[1];
+            data_out[95:64] <= mem_m[2];
+            data_out[127:96] <= mem_m[3];
+            data_out[159:128] <= mem_m[7];
+            data_out[191:160] <= mem_m[15];
+            data_out[223:192] <= mem_m[31];
+            data_out[255:224] <= mem_m[63];
+            // data_out[31:0] <= h+data_out[31:0];
+            // data_out[63:32] <= g+data_out[63:32];
+            // data_out[95:64] <= f+data_out[95:64];
+            // data_out[127:96] <= e+data_out[127:96];
+            // data_out[159:128] <= d+data_out[159:128];
+            // data_out[191:160] <= c+data_out[191:160];
+            // data_out[223:192] <= b+data_out[223:192];
+            // data_out[255:224] <= a+data_out[255:224];
+            //debug 0
             // data_out[255:224] <= done_cnt; appears to be 0
-            data_out[31:0] <= data_out[31:0];
-            data_out[63:32] <= data_out[63:32];
-            data_out[95:64] <= data_out[95:64];
-            data_out[127:96] <= data_out[127:96];
-            data_out[159:128] <= d;
-            data_out[191:160] <= c;
-            data_out[223:192] <= b;
-            data_out[255:224] <= data_out[255:224];
+            //debug 1
+            // data_out[31:0] <= data_out[31:0];
+            // data_out[63:32] <= data_out[63:32];
+            // data_out[95:64] <= data_out[95:64];
+            // data_out[127:96] <= data_out[127:96];
+            // data_out[159:128] <= d;
+            // data_out[191:160] <= c;
+            // data_out[223:192] <= b;
+            // data_out[255:224] <= data_out[255:224];
         end 
     end
 end
