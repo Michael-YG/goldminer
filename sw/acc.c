@@ -13,47 +13,48 @@
 #include <linux/uaccess.h>
 #include "acc.h"
 
-#define DRIVER_NAME "acc"
+#define DRIVER_NAME "sha256_acc"
 
 #define HASHW0(x) (x)
-#define HASHW1(x) (x+1)
-#define HSAHW2(x) (x+2)
-#define HSAHW3(x) (x+3)
-#define HSAHW4(x) (x+4)
-#define HSAHW5(x) (x+5)
-#define HSAHW6(x) (x+6)
-#define HSAHW7(x) (x+7)
-#define HSAHW8(x) (x+8)
-#define HSAHW9(x) (x+9)
-#define HSAHW10(x) (x+10)
-#define HSAHW11(x) (x+11)
-#define HSAHW12(x) (x+12)
-#define HSAHW13(x) (x+13)
-#define HSAHW14(x) (x+14)
-#define HSAHW15(x) (x+15)
+#define HASHW1(x) (x+4)
+#define HSAHW2(x) (x+8)
+#define HSAHW3(x) (x+12)
+#define HSAHW4(x) (x+16)
+#define HSAHW5(x) (x+20)
+#define HSAHW6(x) (x+24)
+#define HSAHW7(x) (x+28)
+#define HSAHW8(x) (x+32)
+#define HSAHW9(x) (x+36)
+#define HSAHW10(x) (x+40)
+#define HSAHW11(x) (x+44)
+#define HSAHW12(x) (x+48)
+#define HSAHW13(x) (x+52)
+#define HSAHW14(x) (x+56)
+#define HSAHW15(x) (x+60)
 
 #define HASHR0(x) (x)
-#define HASHR1(x) (x+1)
-#define HASHR2(x) (x+2)
-#define HASHR3(x) (x+3)
-#define HASHR4(x) (x+4)
-#define HASHR5(x) (x+5)
-#define HASHR6(x) (x+6)
-#define HASHR7(x) (x+7)
-#define HASHR8(x) (x+8)
+#define HASHR1(x) (x+4)
+#define HASHR2(x) (x+8)
+#define HASHR3(x) (x+12)
+#define HASHR4(x) (x+16)
+#define HASHR5(x) (x+20)
+#define HASHR6(x) (x+24)
+#define HASHR7(x) (x+28)
 
-#define CONTROLW(x) (x+16) // write only: sw -> hw
-#define CONTROLR(x) (x+17) // read only: hw -> sw
+#define CONTROLW(x) (x+64) // write only: sw -> hw
+#define CONTROLR(x) (x+68) // read only: hw -> sw
 
 struct acc_dev {
     struct resource res; /* Resource: our registers */
     void __iomem *virtbase; /* Where registers can be accessed in memory */
-    registers_t registers;
+    registers_i_t registers_i;
+    registers_o_t registers_o;
     control_signal_t control_signal;
 } dev;
 
-static void write_hash(registers_t * hash_input)
+static void write_hash(registers_i_t * hash_input)
 {
+
     iowrite32(hash_input->r0, HASHW0(dev.virtbase));
     iowrite32(hash_input->r1, HASHW1(dev.virtbase));
     iowrite32(hash_input->r2, HSAHW2(dev.virtbase));
@@ -70,10 +71,9 @@ static void write_hash(registers_t * hash_input)
     iowrite32(hash_input->r13, HSAHW13(dev.virtbase));
     iowrite32(hash_input->r14, HSAHW14(dev.virtbase));
     iowrite32(hash_input->r15, HSAHW15(dev.virtbase));
-    dev.registers = *hash_input;
 }
 
-static void read_hash(registers_t * hash_output)
+static void read_hash(registers_o_t * hash_output)
 {
     hash_output->r0 = ioread32(HASHR0(dev.virtbase));
     hash_output->r1 = ioread32(HASHR1(dev.virtbase));
@@ -83,10 +83,9 @@ static void read_hash(registers_t * hash_output)
     hash_output->r5 = ioread32(HASHR5(dev.virtbase));
     hash_output->r6 = ioread32(HASHR6(dev.virtbase));
     hash_output->r7 = ioread32(HASHR7(dev.virtbase));
-    hash_output->r8 = ioread32(HASHR8(dev.virtbase)); // handshake signal
 }
 
-static void write_start(unsined int control)
+static void write_control(unsigned int control)
 {
     iowrite32(control, CONTROLW(dev.virtbase));
 }
@@ -102,21 +101,25 @@ static long acc_ioctl(struct file *f, unsigned int cmd, unsigned long arg)
 
     switch (cmd) {
     case ACC_WRITE_HASH:
-        if (copy_from_user(&vla, (registers_arg_t *) arg, sizeof(registers_arg_t)))
+        if (copy_from_user(&vla.registers_i, (registers_i_t *) arg, sizeof(registers_i_t)))
             return -EACCES;
-        write_hash(&vla.registers);
-        write_control(0xffffffff); //start flag
+        write_hash(&vla.registers_i);
+        // write_control(0xffffffff); //start flag
         break;
-    /* Useless */
     case ACC_READ_HASH:
-        vla.registers = dev.registers;
-        if (copy_to_user((registers_arg_t *) arg, &vla, sizeof(registers_arg_t)))
+        read_hash(&vla.registers_o);
+        if (copy_to_user((registers_o_t *) arg, &vla.registers_o, sizeof(registers_o_t)))
             return -EACCES;
         break;
     case CONTROL_READ:
-        vla.control_signal = dev.control_signal;
-        if(copy_to_user((registers_arg_t* arg, &vla, sizeof(registers_arg_t) )))
+        read_control(&vla.control_signal.rr);
+        if(copy_to_user((control_signal_t*) arg, &vla.control_signal.rr, sizeof(control_signal_t)))
             return -EACCES;
+        break;
+    case CONTROL_WRITE:
+        if(copy_from_user((&vla.control_signal.rr), (control_signal_t *) arg, sizeof(control_signal_t)))
+            return -EACCES;
+        write_control(vla.control_signal.rr);
         break;
     default:
         return -EINVAL;
@@ -137,11 +140,11 @@ static struct miscdevice acc_misc_dev = {
 
 static int __init acc_probe(struct platform_device *pdev)
 {
-    register beigh = {0x00000000, 0x00000000,
+    registers_i_t beigh = {0x00000000, 0x00000000,
     0x00000000, 0x00000000, 0x00000000, 0x00000000,
     0x00000000, 0x00000000, 0x00000000, 0x00000000,
     0x00000000, 0x00000000, 0x00000000, 0x00000000,
-    0x00000000, 0x00000000, 0x00000000, 0x00000000};
+    0x00000000, 0x00000000};
 
     int ret;
 
@@ -166,7 +169,7 @@ static int __init acc_probe(struct platform_device *pdev)
     }
 
     write_hash(&beigh);
-    // iowrite32(0x00000000, CONTROLW(dev.virtbase));
+    write_control(0x00000000);
 
     return 0;
 
@@ -187,7 +190,7 @@ static int acc_remove(struct platform_device *pdev)
 
 #ifdef CONFIG_OF
 static const struct of_device_id acc_of_match[] = {
-	{ .compatible = "csee4840,acc-1.0" },
+	{ .compatible = "csee4840,sha256_acc-1.0" },
 	{},
 };
 MODULE_DEVICE_TABLE(of, acc_of_match);
@@ -214,8 +217,8 @@ static void __exit acc_exit(void)
     pr_info(DRIVER_NAME ": exit\n");
 }
 
-module init(acc_init);
-module exit(acc_exit);
+module_init(acc_init);
+module_exit(acc_exit);
 
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("mgy");
