@@ -39,6 +39,24 @@ insmod vga_ball.ko
 
 You should see `PASS` on your screen.
 
+For multiple devices:
+
+- Add multiple instances of the same vga ball module, connect them to the same
+exact ports.
+- Make sure the address ranges of the devices don't overlap. An increment of
+0x100 per device is enough.
+- Make the hardware just as above. Update the hardware files on the fpga.
+- Copy the software files in this repository into `lab3-sw` on your fpga.
+- Mount the driver into the kernel, and run.
+- You should now see this below on your screen - the same test passed on the
+three accelerators running on the fpga. See `hello.c` for the testbench.
+```
+PASS
+PASS
+PASS
+```
+
 Todo:
 - [ ] Perform a reset from software.
+- [ ] Remove VGA outputs.
 - [ ] Reproduce on another fpga following exactly these instructions.
