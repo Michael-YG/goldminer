@@ -21,17 +21,17 @@ pub fn get_hash(bytes: &[u8], index: u8) -> Vec<u8> {
         0 => OpenOptions::new()
             .read(true)
             .write(true)
-            .open("/dev/vga_ball_0")
+            .open("/dev/sha256_0")
             .unwrap(),
         1 => OpenOptions::new()
             .read(true)
             .write(true)
-            .open("/dev/vga_ball_1")
+            .open("/dev/sha256_1")
             .unwrap(),
         _ => OpenOptions::new()
             .read(true)
             .write(true)
-            .open("/dev/vga_ball_2")
+            .open("/dev/sha256_2")
             .unwrap(),
     };
     let raw_fd = file.as_raw_fd();
