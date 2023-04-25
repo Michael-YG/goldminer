@@ -10,7 +10,6 @@ pub fn say_hi() {
 }
 
 pub fn get_hash(bytes: &[u8]) -> Vec<u8> {
-    hi();
     let mut ret = Vec::<u8>::with_capacity(32);
     let len = bytes.len();
     let bits = len * 8;

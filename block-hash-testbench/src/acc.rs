@@ -35,6 +35,7 @@ ioctl_write_int!(read_done_2, VGA_BALL_MAGIC, READ_DONE_2);
 ioctl_write_int!(read_hash_2, VGA_BALL_MAGIC, READ_HASH_2);
 ioctl_write_int!(reset_2, VGA_BALL_MAGIC, RESET_2);
 
+#[allow(dead_code)]
 pub fn say_hi() {
     println!("mod acc says hi!");
 }
