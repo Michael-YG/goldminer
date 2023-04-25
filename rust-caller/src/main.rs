@@ -5,29 +5,29 @@ use std::os::unix::io::{AsRawFd, RawFd};
 
 const DEBUG: bool = false;
 const VGA_BALL_MAGIC: char = 'q';
-const WRITE_INPUT_0_MODE: u8 = 1;
-const READ_DONE_0_MODE: u8 = 2;
-const READ_HASH_0_MODE: u8 = 3;
+const WRITE_INPUT_0: u8 = 1;
+const READ_DONE_0: u8 = 2;
+const READ_HASH_0: u8 = 3;
 
-const WRITE_INPUT_1_MODE: u8 = 4;
-const READ_DONE_1_MODE: u8 = 5;
-const READ_HASH_1_MODE: u8 = 6;
+const WRITE_INPUT_1: u8 = 4;
+const READ_DONE_1: u8 = 5;
+const READ_HASH_1: u8 = 6;
 
-const WRITE_INPUT_2_MODE: u8 = 7;
-const READ_DONE_2_MODE: u8 = 8;
-const READ_HASH_2_MODE: u8 = 9;
+const WRITE_INPUT_2: u8 = 7;
+const READ_DONE_2: u8 = 8;
+const READ_HASH_2: u8 = 9;
 
-ioctl_write_int!(write_input_0, VGA_BALL_MAGIC, WRITE_INPUT_0_MODE);
-ioctl_write_int!(read_done_0, VGA_BALL_MAGIC, READ_DONE_0_MODE);
-ioctl_write_int!(read_hash_0, VGA_BALL_MAGIC, READ_HASH_0_MODE);
+ioctl_write_int!(write_input_0, VGA_BALL_MAGIC, WRITE_INPUT_0);
+ioctl_write_int!(read_done_0, VGA_BALL_MAGIC, READ_DONE_0);
+ioctl_write_int!(read_hash_0, VGA_BALL_MAGIC, READ_HASH_0);
 
-ioctl_write_int!(write_input_1, VGA_BALL_MAGIC, WRITE_INPUT_1_MODE);
-ioctl_write_int!(read_done_1, VGA_BALL_MAGIC, READ_DONE_1_MODE);
-ioctl_write_int!(read_hash_1, VGA_BALL_MAGIC, READ_HASH_1_MODE);
+ioctl_write_int!(write_input_1, VGA_BALL_MAGIC, WRITE_INPUT_1);
+ioctl_write_int!(read_done_1, VGA_BALL_MAGIC, READ_DONE_1);
+ioctl_write_int!(read_hash_1, VGA_BALL_MAGIC, READ_HASH_1);
 
-ioctl_write_int!(write_input_2, VGA_BALL_MAGIC, WRITE_INPUT_2_MODE);
-ioctl_write_int!(read_done_2, VGA_BALL_MAGIC, READ_DONE_2_MODE);
-ioctl_write_int!(read_hash_2, VGA_BALL_MAGIC, READ_HASH_2_MODE);
+ioctl_write_int!(write_input_2, VGA_BALL_MAGIC, WRITE_INPUT_2);
+ioctl_write_int!(read_done_2, VGA_BALL_MAGIC, READ_DONE_2);
+ioctl_write_int!(read_hash_2, VGA_BALL_MAGIC, READ_HASH_2);
 
 #[derive(Copy, Clone, Debug, Default)]
 #[repr(C)]
