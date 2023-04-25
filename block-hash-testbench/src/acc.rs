@@ -2,40 +2,43 @@ use libc::c_uint;
 use nix::ioctl_write_int;
 use std::os::unix::io::RawFd;
 
-const VGA_BALL_MAGIC: char = 'q';
+const SHA256_MAGIC: char = 'q';
+
 const WRITE_INPUT_0: u8 = 1;
-const READ_DONE_0: u8 = 2;
-const READ_HASH_0: u8 = 3;
-const RESET_0: u8 = 10;
-
 const WRITE_INPUT_1: u8 = 4;
-const READ_DONE_1: u8 = 5;
-const READ_HASH_1: u8 = 6;
-const RESET_1: u8 = 11;
-
 const WRITE_INPUT_2: u8 = 7;
+
+const READ_DONE_0: u8 = 2;
+const READ_DONE_1: u8 = 5;
 const READ_DONE_2: u8 = 8;
+
+const READ_HASH_0: u8 = 3;
+const READ_HASH_1: u8 = 6;
 const READ_HASH_2: u8 = 9;
+
+const RESET_0: u8 = 10;
+const RESET_1: u8 = 11;
 const RESET_2: u8 = 12;
 
-ioctl_write_int!(write_input_0, VGA_BALL_MAGIC, WRITE_INPUT_0);
-ioctl_write_int!(read_done_0, VGA_BALL_MAGIC, READ_DONE_0);
-ioctl_write_int!(read_hash_0, VGA_BALL_MAGIC, READ_HASH_0);
-ioctl_write_int!(reset_0, VGA_BALL_MAGIC, RESET_0);
+ioctl_write_int!(write_input_0, SHA256_MAGIC, WRITE_INPUT_0);
+ioctl_write_int!(write_input_1, SHA256_MAGIC, WRITE_INPUT_1);
+ioctl_write_int!(write_input_2, SHA256_MAGIC, WRITE_INPUT_2);
 
-ioctl_write_int!(write_input_1, VGA_BALL_MAGIC, WRITE_INPUT_1);
-ioctl_write_int!(read_done_1, VGA_BALL_MAGIC, READ_DONE_1);
-ioctl_write_int!(read_hash_1, VGA_BALL_MAGIC, READ_HASH_1);
-ioctl_write_int!(reset_1, VGA_BALL_MAGIC, RESET_1);
+ioctl_write_int!(read_done_0, SHA256_MAGIC, READ_DONE_0);
+ioctl_write_int!(read_done_1, SHA256_MAGIC, READ_DONE_1);
+ioctl_write_int!(read_done_2, SHA256_MAGIC, READ_DONE_2);
 
-ioctl_write_int!(write_input_2, VGA_BALL_MAGIC, WRITE_INPUT_2);
-ioctl_write_int!(read_done_2, VGA_BALL_MAGIC, READ_DONE_2);
-ioctl_write_int!(read_hash_2, VGA_BALL_MAGIC, READ_HASH_2);
-ioctl_write_int!(reset_2, VGA_BALL_MAGIC, RESET_2);
+ioctl_write_int!(read_hash_0, SHA256_MAGIC, READ_HASH_0);
+ioctl_write_int!(read_hash_1, SHA256_MAGIC, READ_HASH_1);
+ioctl_write_int!(read_hash_2, SHA256_MAGIC, READ_HASH_2);
+
+ioctl_write_int!(reset_0, SHA256_MAGIC, RESET_0);
+ioctl_write_int!(reset_1, SHA256_MAGIC, RESET_1);
+ioctl_write_int!(reset_2, SHA256_MAGIC, RESET_2);
 
 #[derive(Copy, Clone, Debug, Default)]
 #[repr(C)]
-pub struct vga_ball_input_t {
+pub struct sha256_input {
     pub w0: c_uint,
     pub w1: c_uint,
     pub w2: c_uint,
@@ -56,7 +59,7 @@ pub struct vga_ball_input_t {
 
 #[derive(Debug, Default, Eq, PartialEq)]
 #[repr(C)]
-pub struct vga_ball_hash_t {
+pub struct sha256_hash {
     pub h0: c_uint,
     pub h1: c_uint,
     pub h2: c_uint,
@@ -69,19 +72,19 @@ pub struct vga_ball_hash_t {
 
 #[derive(Debug, Default)]
 #[repr(C)]
-pub struct vga_ball_arg_t {
-    input: vga_ball_input_t,
+pub struct sha256_arg {
+    input: sha256_input,
     done: c_uint,
-    hash: vga_ball_hash_t,
+    hash: sha256_hash,
 }
 
-pub fn write_input(fd: RawFd, input: vga_ball_input_t, index: u8) {
-    let mut vla = vga_ball_arg_t {
+pub fn write_input(fd: RawFd, input: sha256_input, index: u8) {
+    let mut vla = sha256_arg {
         input,
-        hash: vga_ball_hash_t::default(),
+        hash: sha256_hash::default(),
         done: c_uint::default(),
     };
-    let ptr = &mut vla as *mut vga_ball_arg_t;
+    let ptr = &mut vla as *mut sha256_arg;
     let addr = ptr as u32;
 
     match index {
@@ -99,8 +102,8 @@ pub fn write_input(fd: RawFd, input: vga_ball_input_t, index: u8) {
 }
 
 pub fn read_done(fd: RawFd, done: &mut c_uint, index: u8) {
-    let mut vla = vga_ball_arg_t::default();
-    let ptr = &mut vla as *mut vga_ball_arg_t;
+    let mut vla = sha256_arg::default();
+    let ptr = &mut vla as *mut sha256_arg;
     let addr = ptr as u32;
 
     match index {
@@ -119,9 +122,9 @@ pub fn read_done(fd: RawFd, done: &mut c_uint, index: u8) {
     *done = vla.done;
 }
 
-pub fn read_hash(fd: RawFd, hash: &mut vga_ball_hash_t, index: u8) {
-    let mut vla = vga_ball_arg_t::default();
-    let ptr = &mut vla as *mut vga_ball_arg_t;
+pub fn read_hash(fd: RawFd, hash: &mut sha256_hash, index: u8) {
+    let mut vla = sha256_arg::default();
+    let ptr = &mut vla as *mut sha256_arg;
     let addr = ptr as u32;
 
     match index {

@@ -1,4 +1,4 @@
-use crate::acc::{read_done, read_hash, reset, vga_ball_hash_t, vga_ball_input_t, write_input};
+use crate::acc::{read_done, read_hash, reset, sha256_hash, sha256_input, write_input};
 use libc::c_uint;
 use std::fs::OpenOptions;
 use std::os::unix::io::AsRawFd;
@@ -41,7 +41,7 @@ pub fn get_hash(bytes: &[u8], index: u8) -> Vec<u8> {
     let mut pointer = 0;
     while pointer < vec.len() {
         let base = pointer;
-        let input = vga_ball_input_t {
+        let input = sha256_input {
             w0: u32::from_be_bytes(vec[base + 0..base + 4].try_into().unwrap()),
             w1: u32::from_be_bytes(vec[base + 4..base + 8].try_into().unwrap()),
             w2: u32::from_be_bytes(vec[base + 8..base + 12].try_into().unwrap()),
@@ -72,7 +72,7 @@ pub fn get_hash(bytes: &[u8], index: u8) -> Vec<u8> {
         pointer += 64;
     }
 
-    let mut hash: vga_ball_hash_t = vga_ball_hash_t::default();
+    let mut hash: sha256_hash = sha256_hash::default();
     read_hash(raw_fd, &mut hash, index);
     for value in [
         hash.h0, hash.h1, hash.h2, hash.h3, hash.h4, hash.h5, hash.h6, hash.h7,
