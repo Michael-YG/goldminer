@@ -1,13 +1,5 @@
-use crate::acc::say_hi as hi;
 use std::num::Wrapping;
 use std::ops::Shr;
-
-//const ROUNDS: u32 = 3;
-
-#[allow(dead_code)]
-pub fn say_hi() {
-    println!("mod sha256 says hi!");
-}
 
 pub fn get_hash(bytes: &[u8]) -> Vec<u8> {
     let mut ret = Vec::<u8>::with_capacity(32);
@@ -37,36 +29,12 @@ pub fn get_hash(bytes: &[u8]) -> Vec<u8> {
 
     let mut pointer = 0;
     while pointer < vec.len() {
-        //for _ in 0..ROUNDS {
-        // ********** PART 1 ************ //
 
         let mut message_schedule = [Wrapping(0u32); 64];
 
         for (i, byte) in vec[pointer..pointer + 64].iter().enumerate() {
             message_schedule[i / 4].0 |= (*byte as u32) << (3 - (i % 4)) * 8;
         }
-        /*
-        message_schedule[0]  = Wrapping(0x5e824e54u32);
-        message_schedule[1]  = Wrapping(0xfe9dd9c5u32);
-        message_schedule[2]  = Wrapping(0x968697c0u32);
-        message_schedule[3]  = Wrapping(0xd3b72297u32);
-
-        message_schedule[4]  = Wrapping(0x6349fa44u32);
-        message_schedule[5]  = Wrapping(0xd5abe17fu32);
-        message_schedule[6]  = Wrapping(0xae68fd79u32);
-        message_schedule[7]  = Wrapping(0x511e972au32);
-
-        message_schedule[8]  = Wrapping(0xb64b80c8u32);
-        message_schedule[9]  = Wrapping(0x6ae5422fu32);
-        message_schedule[10] = Wrapping(0xaa4dcc23u32);
-        message_schedule[11] = Wrapping(0x77f7aa64u32);
-
-        message_schedule[12] = Wrapping(0x7f27019du32);
-        message_schedule[13] = Wrapping(0x14bcd278u32);
-        message_schedule[14] = Wrapping(0xac411c94u32);
-        message_schedule[15] = Wrapping(0x5f0909fau32);
-        */
-        //print_schedule(&message_schedule);
 
         for i in 16..64 {
             let sigma_0 = sigma_0(message_schedule[i - 15]);
@@ -74,8 +42,6 @@ pub fn get_hash(bytes: &[u8]) -> Vec<u8> {
             message_schedule[i] =
                 message_schedule[i - 16] + sigma_0 + message_schedule[i - 7] + sigma_1;
         }
-
-        // ********** PART 2 ************ //
 
         let mut a = h0;
         let mut b = h1;
@@ -119,13 +85,6 @@ pub fn get_hash(bytes: &[u8]) -> Vec<u8> {
         ret.extend_from_slice(&bytes);
     }
 
-    /*
-        format!(
-            //"{:0>8x} {:0>8x} {:0>8x} {:0>8x} {:0>8x} {:0>8x} {:0>8x} {:0>8x}",
-            "{:0>8x}{:0>8x}{:0>8x}{:0>8x}{:0>8x}{:0>8x}{:0>8x}{:0>8x}",
-            h0, h1, h2, h3, h4, h5, h6, h7
-        )
-    */
     ret
 }
 

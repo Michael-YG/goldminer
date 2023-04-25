@@ -1,9 +1,7 @@
 use libc::c_uint;
 use nix::ioctl_write_int;
-use std::fs::OpenOptions;
-use std::os::unix::io::{AsRawFd, RawFd};
+use std::os::unix::io::{RawFd};
 
-const DEBUG: bool = false;
 const VGA_BALL_MAGIC: char = 'q';
 const WRITE_INPUT_0: u8 = 1;
 const READ_DONE_0: u8 = 2;
@@ -35,43 +33,38 @@ ioctl_write_int!(read_done_2, VGA_BALL_MAGIC, READ_DONE_2);
 ioctl_write_int!(read_hash_2, VGA_BALL_MAGIC, READ_HASH_2);
 ioctl_write_int!(reset_2, VGA_BALL_MAGIC, RESET_2);
 
-#[allow(dead_code)]
-pub fn say_hi() {
-    println!("mod acc says hi!");
-}
-
 #[derive(Copy, Clone, Debug, Default)]
 #[repr(C)]
 pub struct vga_ball_input_t {
-    w0: c_uint,
-    w1: c_uint,
-    w2: c_uint,
-    w3: c_uint,
-    w4: c_uint,
-    w5: c_uint,
-    w6: c_uint,
-    w7: c_uint,
-    w8: c_uint,
-    w9: c_uint,
-    w10: c_uint,
-    w11: c_uint,
-    w12: c_uint,
-    w13: c_uint,
-    w14: c_uint,
-    w15: c_uint,
+    pub w0: c_uint,
+    pub w1: c_uint,
+    pub w2: c_uint,
+    pub w3: c_uint,
+    pub w4: c_uint,
+    pub w5: c_uint,
+    pub w6: c_uint,
+    pub w7: c_uint,
+    pub w8: c_uint,
+    pub w9: c_uint,
+    pub w10: c_uint,
+    pub w11: c_uint,
+    pub w12: c_uint,
+    pub w13: c_uint,
+    pub w14: c_uint,
+    pub w15: c_uint,
 }
 
 #[derive(Debug, Default, Eq, PartialEq)]
 #[repr(C)]
 pub struct vga_ball_hash_t {
-    h0: c_uint,
-    h1: c_uint,
-    h2: c_uint,
-    h3: c_uint,
-    h4: c_uint,
-    h5: c_uint,
-    h6: c_uint,
-    h7: c_uint,
+    pub h0: c_uint,
+    pub h1: c_uint,
+    pub h2: c_uint,
+    pub h3: c_uint,
+    pub h4: c_uint,
+    pub h5: c_uint,
+    pub h6: c_uint,
+    pub h7: c_uint,
 }
 
 #[derive(Debug, Default)]

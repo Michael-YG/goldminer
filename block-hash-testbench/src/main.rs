@@ -1,6 +1,7 @@
 use rand::{thread_rng, Rng};
 
 mod acc;
+mod sha256_hw;
 mod sha256_sw;
 
 const DEBUG: bool = false;
@@ -24,8 +25,10 @@ fn run_test(height: u32) -> Result<(), Box<dyn std::error::Error>> {
     hex::decode_to_slice(resp, &mut header_bytes as &mut [u8]).unwrap();
 
     // TEST
-    let hash_1 = sha256_sw::get_hash(&header_bytes);
-    let mut hash_2 = sha256_sw::get_hash(&hash_1);
+    //let hash_1 = sha256_sw::get_hash(&header_bytes);
+    let hash_1 = sha256_hw::get_hash(&header_bytes);
+    //let mut hash_2 = sha256_sw::get_hash(&hash_1);
+    let mut hash_2 = sha256_hw::get_hash(&hash_1);
     // Bitcoin is little endian
     hash_2.reverse();
 
