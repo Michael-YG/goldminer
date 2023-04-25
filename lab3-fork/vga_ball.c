@@ -66,6 +66,7 @@
 #define H7(x) ((x)+28)
 
 #define DONE(x) ((x)+60)
+#define RESET(x) ((x)+124)
 
 static int init_device_count = 0;
 static int remove_device_count = 0;
@@ -120,6 +121,12 @@ static void read_hash(vga_ball_hash_t *hash, int device_index)
 	hash->h7 = ioread32(H7(dev[device_index].virtbase));
 }
 
+static void reset(int device_index)
+{
+    unsigned reset = 1;
+	iowrite32(reset, RESET(dev[device_index].virtbase) );
+}
+
 /*
  * Handle ioctl() calls from userspace:
  * Read or write the segments on single digits.
@@ -151,6 +158,10 @@ static long vga_ball_ioctl(struct file *f, unsigned int cmd, unsigned long arg)
 			return -EACCES;
 		break;
 
+	case VGA_BALL_RESET_0:
+		reset(0);
+		break;
+
 	case VGA_BALL_WRITE_INPUT_1:
 		if (copy_from_user(&vla, (vga_ball_arg_t *) arg,
 				   sizeof(vga_ball_arg_t)))
@@ -170,6 +181,10 @@ static long vga_ball_ioctl(struct file *f, unsigned int cmd, unsigned long arg)
 		if (copy_to_user((vga_ball_arg_t *) arg, &vla,
 				 sizeof(vga_ball_arg_t)))
 			return -EACCES;
+		break;
+
+	case VGA_BALL_RESET_1:
+		reset(1);
 		break;
 
 	case VGA_BALL_WRITE_INPUT_2:
@@ -192,6 +207,11 @@ static long vga_ball_ioctl(struct file *f, unsigned int cmd, unsigned long arg)
 				 sizeof(vga_ball_arg_t)))
 			return -EACCES;
 		break;
+
+	case VGA_BALL_RESET_2:
+		reset(2);
+		break;
+
 	default:
 		return -EINVAL;
 	}

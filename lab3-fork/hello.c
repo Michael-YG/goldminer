@@ -44,6 +44,31 @@ void write_input(const vga_ball_input_t *input, int index)
   }
 }
 
+void reset(int index)
+{
+  vga_ball_arg_t vla;
+  switch(index) {
+    case 0:
+      if(ioctl(vga_ball_fd_0, VGA_BALL_RESET_0, &vla)) {
+        perror("ioctl(VGA_BALL_RESET_0) failed");
+        return;
+      }
+      break;
+    case 1:
+      if(ioctl(vga_ball_fd_1, VGA_BALL_RESET_1, &vla)) {
+        perror("ioctl(VGA_BALL_RESET_1) failed");
+        return;
+      }
+      break;
+    case 2:
+      if(ioctl(vga_ball_fd_2, VGA_BALL_RESET_2, &vla)) {
+        perror("ioctl(VGA_BALL_RESET_2) failed");
+        return;
+      }
+      break;
+  }
+}
+
 void read_hash(vga_ball_hash_t *hash, int index)
 {
   vga_ball_arg_t vla;
@@ -142,6 +167,24 @@ int main()
   input.w14 = 0xac411c94;
   input.w15 = 0x5f0909fa;
 
+  write_input(&input, 0);
+  write_input(&input, 1);
+  write_input(&input, 2);
+  while (1) {
+    read_done(&done, 0);
+    if(done) break;
+  }
+  while (1) {
+    read_done(&done, 1);
+    if(done) break;
+  }
+  while (1) {
+    read_done(&done, 2);
+    if(done) break;
+  }
+  reset(0);
+  reset(1);
+  reset(2);
   write_input(&input, 0);
   write_input(&input, 1);
   write_input(&input, 2);
