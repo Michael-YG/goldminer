@@ -1,4 +1,4 @@
-/* * Device driver for the VGA video generator
+/* * Device driver for SHA256 hash function
  *
  * A Platform device implemented using the misc subsystem
  *
@@ -12,10 +12,10 @@
  * http://free-electrons.com/docs/
  *
  * "make" to build
- * insmod vga_ball.ko
+ * insmod sha256.ko
  *
  * Check code style with
- * checkpatch.pl --file --no-tree vga_ball.c
+ * checkpatch.pl --file --no-tree sha256.c
  */
 
 #include <linux/module.h>
@@ -31,11 +31,11 @@
 #include <linux/of_address.h>
 #include <linux/fs.h>
 #include <linux/uaccess.h>
-#include "vga_ball.h"
+#include "sha256.h"
 
-#define DRIVER_NAME_0 "vga_ball_0"
-#define DRIVER_NAME_1 "vga_ball_1"
-#define DRIVER_NAME_2 "vga_ball_2"
+#define DRIVER_NAME_0 "sha256_0"
+#define DRIVER_NAME_1 "sha256_1"
+#define DRIVER_NAME_2 "sha256_2"
 
 /* Device registers */
 
@@ -74,7 +74,7 @@ static int remove_device_count = 0;
 /*
  * Information about our device
  */
-struct vga_ball_dev {
+struct sha256_dev {
 	struct resource res; /* Resource: our registers */
 	void __iomem *virtbase; /* Where registers can be accessed in memory */
 } dev[3];
@@ -84,7 +84,7 @@ struct vga_ball_dev {
  * Assumes digit is in range and the device information has been set up
  */
 
-static void write_input(vga_ball_input_t *input, int device_index)
+static void write_input(sha256_input *input, int device_index)
 {
 	iowrite32(input->w0, W0(dev[device_index].virtbase) );
 	iowrite32(input->w1, W1(dev[device_index].virtbase) );
@@ -109,7 +109,7 @@ static void read_done(unsigned *done, int device_index)
 	*done = ioread32(DONE(dev[device_index].virtbase));
 }
 
-static void read_hash(vga_ball_hash_t *hash, int device_index)
+static void read_hash(sha256_hash *hash, int device_index)
 {
 	hash->h0 = ioread32(H0(dev[device_index].virtbase));
 	hash->h1 = ioread32(H1(dev[device_index].virtbase));
@@ -132,83 +132,83 @@ static void reset(int device_index)
  * Read or write the segments on single digits.
  * Note extensive error checking of arguments
  */
-static long vga_ball_ioctl(struct file *f, unsigned int cmd, unsigned long arg)
+static long sha256_ioctl(struct file *f, unsigned int cmd, unsigned long arg)
 {
-	vga_ball_arg_t vla;
+	sha256_arg vla;
 
 	switch (cmd) {
-	case VGA_BALL_WRITE_INPUT_0:
-		if (copy_from_user(&vla, (vga_ball_arg_t *) arg,
-				   sizeof(vga_ball_arg_t)))
+	case WRITE_INPUT_0:
+		if (copy_from_user(&vla, (sha256_arg *) arg,
+				   sizeof(sha256_arg)))
 			return -EACCES;
 		write_input(&vla.input, 0);
 		break;
 
-	case VGA_BALL_READ_DONE_0:
-		read_done(&vla.done, 0);
-		if (copy_to_user((vga_ball_arg_t *) arg, &vla,
-				 sizeof(vga_ball_arg_t)))
-			return -EACCES;
-		break;
-
-	case VGA_BALL_READ_HASH_0:
-		read_hash(&vla.hash, 0);
-		if (copy_to_user((vga_ball_arg_t *) arg, &vla,
-				 sizeof(vga_ball_arg_t)))
-			return -EACCES;
-		break;
-
-	case VGA_BALL_RESET_0:
-		reset(0);
-		break;
-
-	case VGA_BALL_WRITE_INPUT_1:
-		if (copy_from_user(&vla, (vga_ball_arg_t *) arg,
-				   sizeof(vga_ball_arg_t)))
+	case WRITE_INPUT_1:
+		if (copy_from_user(&vla, (sha256_arg *) arg,
+				   sizeof(sha256_arg)))
 			return -EACCES;
 		write_input(&vla.input, 1);
 		break;
 
-	case VGA_BALL_READ_DONE_1:
-		read_done(&vla.done, 1);
-		if (copy_to_user((vga_ball_arg_t *) arg, &vla,
-				 sizeof(vga_ball_arg_t)))
-			return -EACCES;
-		break;
-
-	case VGA_BALL_READ_HASH_1:
-		read_hash(&vla.hash, 1);
-		if (copy_to_user((vga_ball_arg_t *) arg, &vla,
-				 sizeof(vga_ball_arg_t)))
-			return -EACCES;
-		break;
-
-	case VGA_BALL_RESET_1:
-		reset(1);
-		break;
-
-	case VGA_BALL_WRITE_INPUT_2:
-		if (copy_from_user(&vla, (vga_ball_arg_t *) arg,
-				   sizeof(vga_ball_arg_t)))
+	case WRITE_INPUT_2:
+		if (copy_from_user(&vla, (sha256_arg *) arg,
+				   sizeof(sha256_arg)))
 			return -EACCES;
 		write_input(&vla.input, 2);
 		break;
 
-	case VGA_BALL_READ_DONE_2:
+	case READ_DONE_0:
+		read_done(&vla.done, 0);
+		if (copy_to_user((sha256_arg *) arg, &vla,
+				 sizeof(sha256_arg)))
+			return -EACCES;
+		break;
+
+	case READ_DONE_1:
+		read_done(&vla.done, 1);
+		if (copy_to_user((sha256_arg *) arg, &vla,
+				 sizeof(sha256_arg)))
+			return -EACCES;
+		break;
+
+	case READ_DONE_2:
 		read_done(&vla.done, 2);
-		if (copy_to_user((vga_ball_arg_t *) arg, &vla,
-				 sizeof(vga_ball_arg_t)))
+		if (copy_to_user((sha256_arg *) arg, &vla,
+				 sizeof(sha256_arg)))
 			return -EACCES;
 		break;
 
-	case VGA_BALL_READ_HASH_2:
+	case READ_HASH_0:
+		read_hash(&vla.hash, 0);
+		if (copy_to_user((sha256_arg *) arg, &vla,
+				 sizeof(sha256_arg)))
+			return -EACCES;
+		break;
+
+	case READ_HASH_1:
+		read_hash(&vla.hash, 1);
+		if (copy_to_user((sha256_arg *) arg, &vla,
+				 sizeof(sha256_arg)))
+			return -EACCES;
+		break;
+
+	case READ_HASH_2:
 		read_hash(&vla.hash, 2);
-		if (copy_to_user((vga_ball_arg_t *) arg, &vla,
-				 sizeof(vga_ball_arg_t)))
+		if (copy_to_user((sha256_arg *) arg, &vla,
+				 sizeof(sha256_arg)))
 			return -EACCES;
 		break;
 
-	case VGA_BALL_RESET_2:
+	case RESET_0:
+		reset(0);
+		break;
+
+	case RESET_1:
+		reset(1);
+		break;
+
+	case RESET_2:
 		reset(2);
 		break;
 
@@ -220,27 +220,27 @@ static long vga_ball_ioctl(struct file *f, unsigned int cmd, unsigned long arg)
 }
 
 /* The operations our device knows how to do */
-static const struct file_operations vga_ball_fops = {
+static const struct file_operations sha256_fops = {
 	.owner		= THIS_MODULE,
-	.unlocked_ioctl = vga_ball_ioctl,
+	.unlocked_ioctl = sha256_ioctl,
 };
 
 /* Information about our device for the "misc" framework -- like a char dev */
-static struct miscdevice vga_ball_misc_device[] = {
+static struct miscdevice sha256_misc_device[] = {
 	{
 	.minor		= MISC_DYNAMIC_MINOR,
 	.name		= DRIVER_NAME_0,
-	.fops		= &vga_ball_fops,
+	.fops		= &sha256_fops,
 	},
 	{
 	.minor		= MISC_DYNAMIC_MINOR,
 	.name		= DRIVER_NAME_1,
-	.fops		= &vga_ball_fops,
+	.fops		= &sha256_fops,
 	},
 	{
 	.minor		= MISC_DYNAMIC_MINOR,
 	.name		= DRIVER_NAME_2,
-	.fops		= &vga_ball_fops,
+	.fops		= &sha256_fops,
 	}
 };
 
@@ -248,10 +248,8 @@ static struct miscdevice vga_ball_misc_device[] = {
  * Initialization code: get resources (registers) and display
  * a welcome message
  */
-static int __init vga_ball_probe(struct platform_device *pdev)
+static int __init sha256_probe(struct platform_device *pdev)
 {
-        //vga_ball_color_t beige = { 0x00, 0xff, 0x00 };
-        //vga_ball_position_t pos = { 0x00, 0x04, 0x00, 0x04 };
 	int ret;
 	char *driver_names[] = {
 		DRIVER_NAME_0,
@@ -259,8 +257,8 @@ static int __init vga_ball_probe(struct platform_device *pdev)
 		DRIVER_NAME_2,
 	};
 
-	/* Register ourselves as a misc device: creates /dev/vga_ball */
-	ret = misc_register(&vga_ball_misc_device[init_device_count]);
+	/* Register ourselves as a misc device: creates /dev/sha256 */
+	ret = misc_register(&sha256_misc_device[init_device_count]);
 
 	/* Get the address of our registers from the device tree */
 	ret = of_address_to_resource(pdev->dev.of_node, 0, &dev[init_device_count].res);
@@ -295,68 +293,68 @@ static int __init vga_ball_probe(struct platform_device *pdev)
 out_release_mem_region:
 	release_mem_region(dev[init_device_count].res.start, resource_size(&dev[init_device_count].res));
 out_deregister:
-	misc_deregister(&vga_ball_misc_device[init_device_count]);
+	misc_deregister(&sha256_misc_device[init_device_count]);
 	return ret;
 }
 
 /* Clean-up code: release resources */
-static int vga_ball_remove(struct platform_device *pdev)
+static int sha256_remove(struct platform_device *pdev)
 {
 	iounmap(dev[remove_device_count].virtbase);
 	release_mem_region(dev[remove_device_count].res.start, resource_size(&dev[remove_device_count].res));
-	misc_deregister(&vga_ball_misc_device[remove_device_count]);
+	misc_deregister(&sha256_misc_device[remove_device_count]);
 	remove_device_count++;
 	return 0;
 }
 
 /* Which "compatible" string(s) to search for in the Device Tree */
 #ifdef CONFIG_OF
-static const struct of_device_id vga_ball_of_match[] = {
+static const struct of_device_id sha256_of_match[] = {
 	{ .compatible = "csee4840,vga_ball-1.0" },
 	{},
 };
 
-MODULE_DEVICE_TABLE(of, vga_ball_of_match);
+MODULE_DEVICE_TABLE(of, sha256_of_match);
 #endif
 
 /* Information for registering ourselves as a "platform" driver */
-static struct platform_driver vga_ball_driver = {
+static struct platform_driver sha256_driver = {
 	.driver	= {
-		.name	= "vga_ball",
+		.name	= "sha256",
 		.owner	= THIS_MODULE,
-		.of_match_table = of_match_ptr(vga_ball_of_match),
+		.of_match_table = of_match_ptr(sha256_of_match),
 	},
-	.remove	= __exit_p(vga_ball_remove),
+	.remove	= __exit_p(sha256_remove),
 };
 
 /* Called when the module is loaded: set things up */
-static int __init vga_ball_init(void)
+static int __init sha256_init(void)
 {
 	int ret;
-	pr_info("vga_ball : init\n");
+	pr_info("sha256 : init\n");
 
-	ret = platform_driver_probe(&vga_ball_driver, vga_ball_probe);
+	ret = platform_driver_probe(&sha256_driver, sha256_probe);
 	if (ret) {
-		pr_err("failed to register vga ball driver: %d\n", ret);
+		pr_err("failed to register sha256 driver: %d\n", ret);
 		return ret;
 	}
 
-	pr_info("vga ball driver registered for %d matching devices\n", init_device_count);
+	pr_info("sha256 driver registered for %d matching devices\n", init_device_count);
 
 	return 0;
 }
 
 /* Calball when the module is unloaded: release resources */
-static void __exit vga_ball_exit(void)
+static void __exit sha256_exit(void)
 {
-	platform_driver_unregister(&vga_ball_driver);
-	pr_info("vga_ball : exit\n");
-	pr_info("vga ball driver unregistered for %d matching devices\n", remove_device_count);
+	platform_driver_unregister(&sha256_driver);
+	pr_info("sha256 : exit\n");
+	pr_info("sha256 driver unregistered for %d matching devices\n", remove_device_count);
 }
 
-module_init(vga_ball_init);
-module_exit(vga_ball_exit);
+module_init(sha256_init);
+module_exit(sha256_exit);
 
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Stephen A. Edwards, Columbia University");
-MODULE_DESCRIPTION("VGA ball driver");
+MODULE_DESCRIPTION("SHA256 ball driver");

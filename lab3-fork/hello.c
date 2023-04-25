@@ -7,7 +7,7 @@
  */
 
 #include <stdio.h>
-#include "vga_ball.h"
+#include "sha256.h"
 #include <sys/ioctl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -15,29 +15,29 @@
 #include <string.h>
 #include <unistd.h>
 
-int vga_ball_fd_0, vga_ball_fd_1, vga_ball_fd_2;
+int sha256_fd_0, sha256_fd_1, sha256_fd_2;
 
 
-void write_input(const vga_ball_input_t *input, int index)
+void write_input(const sha256_input *input, int index)
 {
-  vga_ball_arg_t vla;
+  sha256_arg vla;
   vla.input = *input;
   switch(index) {
     case 0:
-      if(ioctl(vga_ball_fd_0, VGA_BALL_WRITE_INPUT_0, &vla)) {
-        perror("ioctl(VGA_BALL_WRITE_INPUT_0) failed");
+      if(ioctl(sha256_fd_0, WRITE_INPUT_0, &vla)) {
+        perror("ioctl(WRITE_INPUT_0) failed");
         return;
       }
       break;
     case 1:
-      if(ioctl(vga_ball_fd_1, VGA_BALL_WRITE_INPUT_1, &vla)) {
-        perror("ioctl(VGA_BALL_WRITE_INPUT_1) failed");
+      if(ioctl(sha256_fd_1, WRITE_INPUT_1, &vla)) {
+        perror("ioctl(WRITE_INPUT_1) failed");
         return;
       }
       break;
     case 2:
-      if(ioctl(vga_ball_fd_2, VGA_BALL_WRITE_INPUT_2, &vla)) {
-        perror("ioctl(VGA_BALL_WRITE_INPUT_2) failed");
+      if(ioctl(sha256_fd_2, WRITE_INPUT_2, &vla)) {
+        perror("ioctl(WRITE_INPUT_2) failed");
         return;
       }
       break;
@@ -46,48 +46,48 @@ void write_input(const vga_ball_input_t *input, int index)
 
 void reset(int index)
 {
-  vga_ball_arg_t vla;
+  sha256_arg vla;
   switch(index) {
     case 0:
-      if(ioctl(vga_ball_fd_0, VGA_BALL_RESET_0, &vla)) {
-        perror("ioctl(VGA_BALL_RESET_0) failed");
+      if(ioctl(sha256_fd_0, RESET_0, &vla)) {
+        perror("ioctl(RESET_0) failed");
         return;
       }
       break;
     case 1:
-      if(ioctl(vga_ball_fd_1, VGA_BALL_RESET_1, &vla)) {
-        perror("ioctl(VGA_BALL_RESET_1) failed");
+      if(ioctl(sha256_fd_1, RESET_1, &vla)) {
+        perror("ioctl(RESET_1) failed");
         return;
       }
       break;
     case 2:
-      if(ioctl(vga_ball_fd_2, VGA_BALL_RESET_2, &vla)) {
-        perror("ioctl(VGA_BALL_RESET_2) failed");
+      if(ioctl(sha256_fd_2, RESET_2, &vla)) {
+        perror("ioctl(RESET_2) failed");
         return;
       }
       break;
   }
 }
 
-void read_hash(vga_ball_hash_t *hash, int index)
+void read_hash(sha256_hash *hash, int index)
 {
-  vga_ball_arg_t vla;
+  sha256_arg vla;
   switch(index) {
     case 0:
-      if (ioctl(vga_ball_fd_0, VGA_BALL_READ_HASH_0, &vla)) {
-          perror("ioctl(VGA_BALL_READ_HASH_0) failed");
+      if (ioctl(sha256_fd_0, READ_HASH_0, &vla)) {
+          perror("ioctl(READ_HASH_0) failed");
           return;
       }
       break;
     case 1:
-      if (ioctl(vga_ball_fd_1, VGA_BALL_READ_HASH_1, &vla)) {
-          perror("ioctl(VGA_BALL_READ_HASH_1) failed");
+      if (ioctl(sha256_fd_1, READ_HASH_1, &vla)) {
+          perror("ioctl(READ_HASH_1) failed");
           return;
       }
       break;
     case 2:
-      if (ioctl(vga_ball_fd_2, VGA_BALL_READ_HASH_2, &vla)) {
-          perror("ioctl(VGA_BALL_READ_HASH_2) failed");
+      if (ioctl(sha256_fd_2, READ_HASH_2, &vla)) {
+          perror("ioctl(READ_HASH_2) failed");
           return;
       }
       break;
@@ -97,23 +97,23 @@ void read_hash(vga_ball_hash_t *hash, int index)
 
 void read_done(unsigned *done, int index)
 {
-  vga_ball_arg_t vla;
+  sha256_arg vla;
   switch(index) {
     case 0:
-      if (ioctl(vga_ball_fd_0, VGA_BALL_READ_DONE_0, &vla)) {
-          perror("ioctl(VGA_BALL_READ_DONE_0) failed");
+      if (ioctl(sha256_fd_0, READ_DONE_0, &vla)) {
+          perror("ioctl(READ_DONE_0) failed");
           return;
       }
       break;
     case 1:
-      if (ioctl(vga_ball_fd_1, VGA_BALL_READ_DONE_1, &vla)) {
-          perror("ioctl(VGA_BALL_READ_DONE_1) failed");
+      if (ioctl(sha256_fd_1, READ_DONE_1, &vla)) {
+          perror("ioctl(READ_DONE_1) failed");
           return;
       }
       break;
     case 2:
-      if (ioctl(vga_ball_fd_2, VGA_BALL_READ_DONE_2, &vla)) {
-          perror("ioctl(VGA_BALL_READ_DONE_2) failed");
+      if (ioctl(sha256_fd_2, READ_DONE_2, &vla)) {
+          perror("ioctl(READ_DONE_2) failed");
           return;
       }
       break;
@@ -123,22 +123,22 @@ void read_done(unsigned *done, int index)
 
 int main()
 {
-  vga_ball_arg_t vla;
-  static const char filename_0[] = "/dev/vga_ball_0";
-  static const char filename_1[] = "/dev/vga_ball_1";
-  static const char filename_2[] = "/dev/vga_ball_2";
+  sha256_arg vla;
+  static const char filename_0[] = "/dev/sha256_0";
+  static const char filename_1[] = "/dev/sha256_1";
+  static const char filename_2[] = "/dev/sha256_2";
 
-  printf("VGA ball Userspace program started\n");
+  printf("SHA256 Userspace program started\n");
 
-  if ( (vga_ball_fd_0 = open(filename_0, O_RDWR)) == -1) {
+  if ( (sha256_fd_0 = open(filename_0, O_RDWR)) == -1) {
     fprintf(stderr, "could not open %s\n", filename_0);
     return -1;
   }
-  if ( (vga_ball_fd_1 = open(filename_1, O_RDWR)) == -1) {
+  if ( (sha256_fd_1 = open(filename_1, O_RDWR)) == -1) {
     fprintf(stderr, "could not open %s\n", filename_1);
     return -1;
   }
-  if ( (vga_ball_fd_2 = open(filename_2, O_RDWR)) == -1) {
+  if ( (sha256_fd_2 = open(filename_2, O_RDWR)) == -1) {
     fprintf(stderr, "could not open %s\n", filename_2);
     return -1;
   }
@@ -146,7 +146,7 @@ int main()
   unsigned done = 0;
   unsigned debug = 0;
 
-  vga_ball_input_t input;
+  sha256_input input;
   input.w0  = 0x5e824e54;
   input.w1  = 0xfe9dd9c5;
   input.w2  = 0x968697c0;
@@ -233,7 +233,7 @@ int main()
 
   //printf("%x\n", done);
 
-  vga_ball_hash_t hash_0;
+  sha256_hash hash_0;
   hash_0.h0 = 0x00000000;
   hash_0.h1 = 0x00000000;
   hash_0.h2 = 0x00000000;
@@ -244,7 +244,7 @@ int main()
   hash_0.h7 = 0x00000000;
   read_hash(&hash_0, 0);
 
-  vga_ball_hash_t hash_1;
+  sha256_hash hash_1;
   hash_1.h0 = 0x00000000;
   hash_1.h1 = 0x00000000;
   hash_1.h2 = 0x00000000;
@@ -255,7 +255,7 @@ int main()
   hash_1.h7 = 0x00000000;
   read_hash(&hash_1, 1);
 
-  vga_ball_hash_t hash_2;
+  sha256_hash hash_2;
   hash_2.h0 = 0x00000000;
   hash_2.h1 = 0x00000000;
   hash_2.h2 = 0x00000000;
@@ -325,6 +325,6 @@ int main()
   else
     printf("FAIL\n");
 
-  printf("VGA BALL Userspace program terminating\n");
+  printf("SHA256 Userspace program terminating\n");
   return 0;
 }
