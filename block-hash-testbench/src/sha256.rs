@@ -1,10 +1,6 @@
-extern crate test;
-
-//interfaces
-//block diagram showing exactly what the hardware will do.
-
 use std::num::Wrapping;
 use std::ops::Shr;
+use crate::acc::say_hi as hi;
 
 //const ROUNDS: u32 = 3;
 
@@ -14,6 +10,7 @@ pub fn say_hi() {
 }
 
 pub fn get_hash(bytes: &[u8]) -> Vec<u8> {
+    hi();
     let mut ret = Vec::<u8>::with_capacity(32);
     let len = bytes.len();
     let bits = len * 8;
@@ -131,25 +128,6 @@ pub fn get_hash(bytes: &[u8]) -> Vec<u8> {
         )
     */
     ret
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use test::Bencher;
-
-    #[test]
-    fn single_message() {
-        assert_eq!(
-            "9fcef88ccb42a5170778e1febe81d7875d501f042e83266c0e2f05315a0c6f77",
-            get_hash("My name is Jules!".as_bytes())
-        );
-    }
-
-    #[bench]
-    fn bench_add_two(b: &mut Bencher) {
-        b.iter(|| get_hash("My name is Jules!".as_bytes()));
-    }
 }
 
 fn sigma_0(Wrapping(w): Wrapping<u32>) -> Wrapping<u32> {

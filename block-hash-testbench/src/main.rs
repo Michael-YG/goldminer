@@ -1,7 +1,7 @@
-#![feature(test)]
 use rand::{thread_rng, Rng};
 
 mod sha256;
+mod acc;
 
 const DEBUG: bool = false;
 
