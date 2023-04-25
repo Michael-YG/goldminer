@@ -12,7 +12,7 @@ module vga_ball(input logic        clk,
 		input logic 	   write,
 		input logic 	   read,
 		input 		   chipselect,
-		input logic [3:0]  address,
+		input logic [4:0]  address,
 
 		output logic [7:0] VGA_R, VGA_G, VGA_B,
 		output logic 	   VGA_CLK, VGA_HS, VGA_VS,
@@ -23,6 +23,7 @@ module vga_ball(input logic        clk,
    logic [7:0] counter;
    logic [31:0] a, b, c, d, e, f, g, h;
    logic [31:0] h0, h1, h2, h3, h4, h5, h6, h7, done = 1;
+   logic [31:0] reg_reset;
    logic go;
    /* verilator lint_off UNUSED */
    logic [31:0] trash;
@@ -51,11 +52,12 @@ module vga_ball(input logic        clk,
    };
 
    always_ff @(posedge clk) begin
-      if (reset) begin
+      if (reset || reg_reset == 32'h1) begin
          counter <= 0;
          done <= 1;
          go <= 0;
          readdata <= 0;
+         reg_reset <= 0;
          h0 <= 32'h6a09e667;
          h1 <= 32'hbb67ae85;
          h2 <= 32'h3c6ef372;
@@ -68,27 +70,28 @@ module vga_ball(input logic        clk,
 
       if (chipselect && write) begin
          case (address)
-            4'h0: message_schedule[0] <= writedata;
-            4'h1: message_schedule[1] <= writedata;
-            4'h2: message_schedule[2] <= writedata;
-            4'h3: message_schedule[3] <= writedata;
-            4'h4: message_schedule[4] <= writedata;
-            4'h5: message_schedule[5] <= writedata;
-            4'h6: message_schedule[6] <= writedata;
-            4'h7: message_schedule[7] <= writedata;
-            4'h8: message_schedule[8] <= writedata;
-            4'h9: message_schedule[9] <= writedata;
-            4'ha: message_schedule[10] <= writedata;
-            4'hb: message_schedule[11] <= writedata;
-            4'hc: message_schedule[12] <= writedata;
-            4'hd: message_schedule[13] <= writedata;
-            4'he: message_schedule[14] <= writedata;
-            4'hf:
+            5'h0: message_schedule[0] <= writedata;
+            5'h1: message_schedule[1] <= writedata;
+            5'h2: message_schedule[2] <= writedata;
+            5'h3: message_schedule[3] <= writedata;
+            5'h4: message_schedule[4] <= writedata;
+            5'h5: message_schedule[5] <= writedata;
+            5'h6: message_schedule[6] <= writedata;
+            5'h7: message_schedule[7] <= writedata;
+            5'h8: message_schedule[8] <= writedata;
+            5'h9: message_schedule[9] <= writedata;
+            5'ha: message_schedule[10] <= writedata;
+            5'hb: message_schedule[11] <= writedata;
+            5'hc: message_schedule[12] <= writedata;
+            5'hd: message_schedule[13] <= writedata;
+            5'he: message_schedule[14] <= writedata;
+            5'hf:
             begin
                   message_schedule[15] <= writedata;
                   go <= 1;
                   done <= 0;
             end
+            5'h1f: reg_reset <= writedata;
             default: trash <= writedata;
          endcase
          readdata <= 0;
@@ -96,15 +99,15 @@ module vga_ball(input logic        clk,
 
       if (chipselect && read) begin
          case (address)
-            4'h0: readdata <= h0;
-            4'h1: readdata <= h1;
-            4'h2: readdata <= h2;
-            4'h3: readdata <= h3;
-            4'h4: readdata <= h4;
-            4'h5: readdata <= h5;
-            4'h6: readdata <= h6;
-            4'h7: readdata <= h7;
-            4'hf: readdata <= done;
+            5'h0: readdata <= h0;
+            5'h1: readdata <= h1;
+            5'h2: readdata <= h2;
+            5'h3: readdata <= h3;
+            5'h4: readdata <= h4;
+            5'h5: readdata <= h5;
+            5'h6: readdata <= h6;
+            5'h7: readdata <= h7;
+            5'hf: readdata <= done;
             default: readdata <= 0;
          endcase
       end
