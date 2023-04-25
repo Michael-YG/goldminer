@@ -1,6 +1,6 @@
 use libc::c_uint;
 use nix::ioctl_write_int;
-use std::os::unix::io::{RawFd};
+use std::os::unix::io::RawFd;
 
 const VGA_BALL_MAGIC: char = 'q';
 const WRITE_INPUT_0: u8 = 1;

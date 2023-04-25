@@ -29,7 +29,6 @@ pub fn get_hash(bytes: &[u8]) -> Vec<u8> {
 
     let mut pointer = 0;
     while pointer < vec.len() {
-
         let mut message_schedule = [Wrapping(0u32); 64];
 
         for (i, byte) in vec[pointer..pointer + 64].iter().enumerate() {
