@@ -8,26 +8,32 @@ const VGA_BALL_MAGIC: char = 'q';
 const WRITE_INPUT_0: u8 = 1;
 const READ_DONE_0: u8 = 2;
 const READ_HASH_0: u8 = 3;
+const RESET_0: u8 = 10;
 
 const WRITE_INPUT_1: u8 = 4;
 const READ_DONE_1: u8 = 5;
 const READ_HASH_1: u8 = 6;
+const RESET_1: u8 = 11;
 
 const WRITE_INPUT_2: u8 = 7;
 const READ_DONE_2: u8 = 8;
 const READ_HASH_2: u8 = 9;
+const RESET_2: u8 = 12;
 
 ioctl_write_int!(write_input_0, VGA_BALL_MAGIC, WRITE_INPUT_0);
 ioctl_write_int!(read_done_0, VGA_BALL_MAGIC, READ_DONE_0);
 ioctl_write_int!(read_hash_0, VGA_BALL_MAGIC, READ_HASH_0);
+ioctl_write_int!(reset_0, VGA_BALL_MAGIC, RESET_0);
 
 ioctl_write_int!(write_input_1, VGA_BALL_MAGIC, WRITE_INPUT_1);
 ioctl_write_int!(read_done_1, VGA_BALL_MAGIC, READ_DONE_1);
 ioctl_write_int!(read_hash_1, VGA_BALL_MAGIC, READ_HASH_1);
+ioctl_write_int!(reset_1, VGA_BALL_MAGIC, RESET_1);
 
 ioctl_write_int!(write_input_2, VGA_BALL_MAGIC, WRITE_INPUT_2);
 ioctl_write_int!(read_done_2, VGA_BALL_MAGIC, READ_DONE_2);
 ioctl_write_int!(read_hash_2, VGA_BALL_MAGIC, READ_HASH_2);
+ioctl_write_int!(reset_2, VGA_BALL_MAGIC, RESET_2);
 
 #[derive(Copy, Clone, Debug, Default)]
 #[repr(C)]
@@ -136,6 +142,21 @@ fn read_hash(fd: RawFd, hash: &mut vga_ball_hash_t, index: u8) {
     *hash = vla.hash;
 }
 
+fn reset(fd: RawFd, index: u8) {
+    match index {
+        0 => unsafe {
+            reset_0(fd, 0).unwrap();
+        },
+        1 => unsafe {
+            reset_1(fd, 0).unwrap();
+        },
+        2 => unsafe {
+            reset_2(fd, 0).unwrap();
+        },
+        _ => println!("Didn't match"),
+    }
+}
+
 fn main() {
     let file_0 = OpenOptions::new()
         .read(true)
@@ -176,6 +197,10 @@ fn main() {
         w14: 0xac411c94,
         w15: 0x5f0909fa,
     };
+
+    reset(file_0.as_raw_fd(), 0);
+    reset(file_1.as_raw_fd(), 1);
+    reset(file_2.as_raw_fd(), 2);
 
     for _ in 0..3 {
         let mut done: c_uint = 0;
