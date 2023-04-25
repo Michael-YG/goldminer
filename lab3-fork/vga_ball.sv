@@ -1,5 +1,5 @@
 /*
- * Avalon memory-mapped peripheral that generates VGA
+ * Avalon memory-mapped peripheral that generates sha256 hashes
  *
  * Stephen A. Edwards
  * Columbia University
@@ -12,12 +12,7 @@ module vga_ball(input logic        clk,
 		input logic 	   write,
 		input logic 	   read,
 		input 		   chipselect,
-		input logic [4:0]  address,
-
-		output logic [7:0] VGA_R, VGA_G, VGA_B,
-		output logic 	   VGA_CLK, VGA_HS, VGA_VS,
-		                   VGA_BLANK_n,
-		output logic 	   VGA_SYNC_n);
+		input logic [4:0]  address);
 
    logic [63:0][31:0] message_schedule;
    logic [7:0] counter;
