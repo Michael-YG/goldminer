@@ -8,7 +8,6 @@ const DEBUG: bool = false;
 
 fn run_test(height: u32) -> Result<(), Box<dyn std::error::Error>> {
     // SETUP
-    print!("{:>6}... ", height);
     // Get the hash of the block at @height
     let gold = reqwest::blocking::get(
         "https://mempool.space/api/block-height/".to_owned() + &height.to_string(),
@@ -24,21 +23,25 @@ fn run_test(height: u32) -> Result<(), Box<dyn std::error::Error>> {
     let mut header_bytes = [0u8; 80];
     hex::decode_to_slice(resp, &mut header_bytes as &mut [u8]).unwrap();
 
-    // TEST
-    let hash_1 = sha256_hw::get_hash(&header_bytes, 0);
-    let mut hash_2 = sha256_hw::get_hash(&hash_1, 0);
-    // Bitcoin is little endian
-    hash_2.reverse();
+    for i in 0..3 {
+        print!("{:>6}[{}]... ", height, i);
+        // TEST
+        let hash_1 = sha256_hw::get_hash(&header_bytes, i);
+        let mut hash_2 = sha256_hw::get_hash(&hash_1, i);
+        // Bitcoin is little endian
+        hash_2.reverse();
 
-    //CLEANUP
-    if DEBUG {
-        println!("{}", hex::encode(&hash_2));
+        //CLEANUP
+        if DEBUG {
+            println!("{}", hex::encode(&hash_2));
+        }
+        if gold == hex::encode(hash_2) {
+            println!("PASS");
+        } else {
+            println!("FAIL");
+        }
     }
-    if gold == hex::encode(hash_2) {
-        println!("PASS");
-    } else {
-        println!("FAIL");
-    }
+    println!("");
     Ok(())
 }
 
