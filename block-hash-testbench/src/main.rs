@@ -1,7 +1,7 @@
 use rand::{thread_rng, Rng};
 
-mod sha256_sw;
 mod acc;
+mod sha256_sw;
 
 const DEBUG: bool = false;
 

@@ -1,6 +1,6 @@
+use crate::acc::say_hi as hi;
 use std::num::Wrapping;
 use std::ops::Shr;
-use crate::acc::say_hi as hi;
 
 //const ROUNDS: u32 = 3;
 
