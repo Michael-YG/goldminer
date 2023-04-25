@@ -3,7 +3,7 @@ use libc::c_uint;
 use std::fs::OpenOptions;
 use std::os::unix::io::AsRawFd;
 
-pub fn get_hash(bytes: &[u8]) -> Vec<u8> {
+pub fn get_hash(bytes: &[u8], index: u8) -> Vec<u8> {
     let mut ret = Vec::<u8>::with_capacity(32);
     let len = bytes.len();
     let bits = len * 8;
@@ -17,15 +17,28 @@ pub fn get_hash(bytes: &[u8]) -> Vec<u8> {
     }
     vec.extend_from_slice(&length.to_be_bytes());
 
-    let file_0 = OpenOptions::new()
-        .read(true)
-        .write(true)
-        .open("/dev/vga_ball_0")
-        .unwrap();
+    let raw_fd = match index {
+        0 => OpenOptions::new()
+            .read(true)
+            .write(true)
+            .open("/dev/vga_ball_0")
+            .unwrap()
+            .as_raw_fd(),
+        1 => OpenOptions::new()
+            .read(true)
+            .write(true)
+            .open("/dev/vga_ball_1")
+            .unwrap()
+            .as_raw_fd(),
+        _ => OpenOptions::new()
+            .read(true)
+            .write(true)
+            .open("/dev/vga_ball_2")
+            .unwrap()
+            .as_raw_fd(),
+    };
 
-    let raw_fd = file_0.as_raw_fd();
-
-    reset(raw_fd, 0);
+    reset(raw_fd, index);
 
     let mut pointer = 0;
     while pointer < vec.len() {
@@ -48,11 +61,11 @@ pub fn get_hash(bytes: &[u8]) -> Vec<u8> {
             w14: u32::from_be_bytes(vec[base + 56..base + 60].try_into().unwrap()),
             w15: u32::from_be_bytes(vec[base + 60..base + 64].try_into().unwrap()),
         };
-        write_input(raw_fd, input, 0);
+        write_input(raw_fd, input, index);
 
         let mut done: c_uint = 0;
         loop {
-            read_done(raw_fd, &mut done, 0);
+            read_done(raw_fd, &mut done, index);
             if done == 1 {
                 break;
             }
@@ -62,7 +75,7 @@ pub fn get_hash(bytes: &[u8]) -> Vec<u8> {
     }
 
     let mut hash: vga_ball_hash_t = vga_ball_hash_t::default();
-    read_hash(raw_fd, &mut hash, 0);
+    read_hash(raw_fd, &mut hash, index);
     for value in [
         hash.h0, hash.h1, hash.h2, hash.h3, hash.h4, hash.h5, hash.h6, hash.h7,
     ] {
