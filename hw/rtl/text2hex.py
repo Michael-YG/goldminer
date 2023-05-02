@@ -3,8 +3,12 @@ import sys
 from intelhex import IntelHex
 
 def parse_hex_numbers(hex_block):
-    hex_numbers = re.findall(r"32'h([0-9a-fA-F]+)", hex_block)
-    return [int(h, 16) for h in hex_numbers]
+    hex_numbers = re.findall(r"32'h([0-9a-fA-F]+)", hex_block) #r before the string is used to denote a raw string, which treats backslashes as literal characters.
+    print(hex_numbers)
+    result = [int(h,16) for h in hex_numbers]
+    print(result)
+    return result
+    # return [int(h, 16) for h in hex_numbers]
 
 def create_intel_hex(hex_numbers, start_address=0, output_filename='output.hex'):
     ih = IntelHex()
