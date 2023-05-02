@@ -12,6 +12,9 @@ QuestaSim vlog 10.7b_1 Compiler 2018.07 Jul 26 2018
 Top level modules:
 	simple_sha256_tb
 
+} {} {}} /homes/user/stud/fall22/ms6525/Desktop/goldminer/hw/rtl/sha256_incl.svh {1 {vlog -work work -vopt -sv -stats=none /homes/user/stud/fall22/ms6525/Desktop/goldminer/hw/rtl/sha256_incl.svh
+QuestaSim vlog 10.7b_1 Compiler 2018.07 Jul 26 2018
+
 } {} {}} /homes/user/stud/fall22/ms6525/Desktop/goldminer/hw/rtl/sha256_module.sv {1 {vlog -work work -vopt -sv -stats=none /homes/user/stud/fall22/ms6525/Desktop/goldminer/hw/rtl/sha256_module.sv
 QuestaSim vlog 10.7b_1 Compiler 2018.07 Jul 26 2018
 -- Compiling module sha256_module
@@ -25,8 +28,5 @@ QuestaSim vlog 10.7b_1 Compiler 2018.07 Jul 26 2018
 
 Top level modules:
 	sha256_module
-
-} {} {}} /homes/user/stud/fall22/ms6525/Desktop/goldminer/hw/rtl/sha256_incl.svh {1 {vlog -work work -vopt -sv -stats=none /homes/user/stud/fall22/ms6525/Desktop/goldminer/hw/rtl/sha256_incl.svh
-QuestaSim vlog 10.7b_1 Compiler 2018.07 Jul 26 2018
 
 } {} {}}

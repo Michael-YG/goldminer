@@ -97,7 +97,7 @@ $(SOF) $(HPS_PIN_MAP) : $(QIP) $(QPF) $(QSF) $(HPS_PIN_TCL)
 	quartus_sta -t $(HPS_PIN_TCL) $(SYSTEM)
 	quartus_fit $(SYSTEM)
 	quartus_asm $(SYSTEM)
-#quartus_sh --flow compile $(QPF)
+#	quartus_sh --flow compile $(QPF)
 
 # rbf
 #
