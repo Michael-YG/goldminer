@@ -3,7 +3,7 @@
 `include "sha256_incl.svh"
 
 module sha256_module (
-    input clk, reset, start,
+    input clk, reset, start,acc_reset,
     input [511:0] data_in,
     output logic [255:0] data_out,
     output logic done
@@ -26,7 +26,7 @@ logic [5:0] cnt_0,cnt_1;
 
 // counter for word expansion
 always_ff @ (posedge clk) begin
-    if(reset)
+    if(reset || acc_reset)
         cnt_0 <= 0;
     else begin
         if(start) cnt_0 <= cnt_0 + 1;
@@ -40,7 +40,7 @@ end
 
 //counter for operation
 always_ff @ (posedge clk) begin
-    if (reset) cnt_1 <= 0;
+    if (reset || acc_reset) cnt_1 <= 0;
     else
         if(cnt_0 == 0) cnt_1 <= 0;
         else 
@@ -59,7 +59,7 @@ sig0 sig0_0(.x(mem_m[cnt_0-15]),.sig0(sig0_next_0));
 sig1 sig1_0(.x(mem_m[cnt_0-2]),.sig1(sig1_next_0));
 
 always_ff @ (posedge clk) begin
-    if(reset)
+    if(reset || acc_reset)
         for (int i = 0; i < 64; i=i+1)
             mem_m[i] <= 0;
     else begin
@@ -110,12 +110,12 @@ end
 
 // assign done = cnt_1 == 63;
 always_ff @ (posedge clk) begin
-    if(reset) done <= 0;
+    if(reset || acc_reset) done <= 0;
     else done <= cnt_1 == 63;
 end
 
 always_ff @ (posedge clk) begin
-    if(reset) begin
+    if(reset || acc_reset) begin
         data_out[255:224] <= `SHA256_H0;
         data_out[223:192] <= `SHA256_H1;
         data_out[191:160] <= `SHA256_H2;

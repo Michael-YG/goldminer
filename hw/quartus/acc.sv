@@ -68,7 +68,8 @@ always_ff @ (posedge clk)
     else control_buf <= address == 16 && loading? writedata : 0;
 
 assign start = control_buf == 32'hffffffff;
-assign acc_reset = (control_buf == 32'hff0000ff) | reset;
+// assign acc_reset = (control_buf == 32'hff0000ff) | reset;
+assign acc_reset = control_buf == 32'hff0000ff;
 assign hash_ack = control_buf == 32'h0f0f0f0f; // handshake ack from sw, received when hash value is sent to sw part
 
 /* Sending logic */
@@ -96,7 +97,8 @@ always_ff @ (posedge clk)
 /**** Module ports map ****/
 sha256_module sha256_module_0(
     .clk(clk),
-    .reset(acc_reset),
+    .reset(reset),
+    .acc_reset(acc_reset),
     .start(start),
     .data_in(buffer),
     .data_out(hashvalue),
