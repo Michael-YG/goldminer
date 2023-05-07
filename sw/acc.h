@@ -46,9 +46,19 @@ typedef struct {
 #define SHA256_IOC_MAGIC 's'
 
 // Commands definition
-#define ACC_WRITE_HASH _IOW(SHA256_IOC_MAGIC, 1, registers_i_t *)
-#define ACC_READ_HASH _IOR(SHA256_IOC_MAGIC, 2, registers_o_t *)
-#define CONTROL_READ _IOR(SHA256_IOC_MAGIC, 3, unsigned int *)
-#define CONTROL_WRITE _IOW(SHA256_IOC_MAGIC, 4, unsigned int *)
+#define ACC_WRITE_HASH0 _IOW(SHA256_IOC_MAGIC, 1, registers_i_t *)
+#define ACC_READ_HASH0 _IOR(SHA256_IOC_MAGIC, 2, registers_o_t *)
+#define CONTROL_READ0 _IOR(SHA256_IOC_MAGIC, 3, unsigned int *)
+#define CONTROL_WRITE0 _IOW(SHA256_IOC_MAGIC, 4, unsigned int *)
+
+#define ACC_WRITE_HASH1 _IOW(SHA256_IOC_MAGIC, 5, registers_i_t *)
+#define ACC_READ_HASH1 _IOR(SHA256_IOC_MAGIC, 6, registers_o_t *)
+#define CONTROL_READ1 _IOR(SHA256_IOC_MAGIC, 7, unsigned int *)
+#define CONTROL_WRITE1 _IOW(SHA256_IOC_MAGIC, 8, unsigned int *)
+
+#define ACC_WRITE_HASH2 _IOW(SHA256_IOC_MAGIC, 9, registers_i_t *)
+#define ACC_READ_HASH2 _IOR(SHA256_IOC_MAGIC, 10, registers_o_t *)
+#define CONTROL_READ2 _IOR(SHA256_IOC_MAGIC, 11, unsigned int *)
+#define CONTROL_WRITE2 _IOW(SHA256_IOC_MAGIC, 12, unsigned int *)
 
 #endif
