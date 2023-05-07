@@ -26,7 +26,9 @@ logic [5:0] cnt_0,cnt_1;
 
 // counter for word expansion
 always_ff @ (posedge clk) begin
-    if(reset || acc_reset)
+    if(reset)
+        cnt_0 <= 0;
+    else if(acc_reset)
         cnt_0 <= 0;
     else begin
         if(start) cnt_0 <= cnt_0 + 1;
@@ -40,7 +42,8 @@ end
 
 //counter for operation
 always_ff @ (posedge clk) begin
-    if (reset || acc_reset) cnt_1 <= 0;
+    if (reset) cnt_1 <= 0;
+    else if(acc_reset) cnt_1 <= 0;
     else
         if(cnt_0 == 0) cnt_1 <= 0;
         else 
@@ -59,9 +62,12 @@ sig0 sig0_0(.x(mem_m[cnt_0-15]),.sig0(sig0_next_0));
 sig1 sig1_0(.x(mem_m[cnt_0-2]),.sig1(sig1_next_0));
 
 always_ff @ (posedge clk) begin
-    if(reset || acc_reset)
+    if(reset)
         for (int i = 0; i < 64; i=i+1)
             mem_m[i] <= 0;
+    // else if(acc_reset)
+    //     for (int i = 0; i < 64; i=i+1)
+    //         mem_m[i] <= 0;
     else begin
         if(!cnt_0[4] && !cnt_1[4] && !cnt_0[5])
             mem_m[cnt_0] <= data_in[address +: 32];
@@ -110,12 +116,22 @@ end
 
 // assign done = cnt_1 == 63;
 always_ff @ (posedge clk) begin
-    if(reset || acc_reset) done <= 0;
+    if(reset) done <= 0;
+    else if(acc_reset) done <= 0;
     else done <= cnt_1 == 63;
 end
 
 always_ff @ (posedge clk) begin
-    if(reset || acc_reset) begin
+    if(reset) begin
+        data_out[255:224] <= `SHA256_H0;
+        data_out[223:192] <= `SHA256_H1;
+        data_out[191:160] <= `SHA256_H2;
+        data_out[159:128] <= `SHA256_H3;
+        data_out[127:96] <= `SHA256_H4;
+        data_out[95:64] <= `SHA256_H5;
+        data_out[63:32] <= `SHA256_H6;
+        data_out[31:0] <= `SHA256_H7;
+    end else if(acc_reset) begin
         data_out[255:224] <= `SHA256_H0;
         data_out[223:192] <= `SHA256_H1;
         data_out[191:160] <= `SHA256_H2;
