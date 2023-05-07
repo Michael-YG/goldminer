@@ -22,17 +22,31 @@ localparam [0:63] [31:0] mem_k = '{
 
 logic [31:0] mem_m [0:63];
 logic [31:0] a,b,c,d,e,f,g,h;
-logic [5:0] cnt_0,cnt_2;
+logic [5:0] cnt_0,cnt_1;
 
 // counter for word expansion
 always_ff @ (posedge clk) begin
     if(reset)
         cnt_0 <= 0;
+    else begin
+        if(start) cnt_0 <= cnt_0 + 1;
+        else cnt_0 <= cnt_0 == 0?cnt_0:cnt_0+1;
+    end
+        // if(start)
+        //     cnt_0 <= cnt_0 + 1;
+        // else  
+        //     cnt_0 <= cnt_0 == 0?cnt_0:(cnt_0 == 63?cnt_0:cnt_0 + 1);
+end
+
+//counter for operation
+always_ff @ (posedge clk) begin
+    if (reset) cnt_1 <= 0;
     else
-        if(start)
-            cnt_0 <= cnt_0 + 1;
-        else  
-            cnt_0 <= cnt_0 == 0?cnt_0:(cnt_0 == 63?cnt_0:cnt_0 + 1);
+        if(cnt_0 == 0) cnt_1 <= 0;
+        else 
+            if (cnt_0==1) cnt_1 <= cnt_1+1;
+            else cnt_1 <= cnt_1 == 0? cnt_1: cnt_1+1;
+            // else cnt_1 <= cnt_1 == 0? 0 : (cnt_1 == 63? cnt_1:cnt_1 + 1);
 end
 
 logic [31:0] sig1_next_0;
@@ -49,21 +63,11 @@ always_ff @ (posedge clk) begin
         for (int i = 0; i < 64; i=i+1)
             mem_m[i] <= 0;
     else begin
-        if(cnt_0[4] == 0 && cnt_2[4] == 0 && !cnt_0[5])
+        if(!cnt_0[4] && !cnt_1[4] && !cnt_0[5])
             mem_m[cnt_0] <= data_in[address +: 32];
         else
             mem_m[cnt_0] <= sig1_next_0 + mem_m[cnt_0-7] + sig0_next_0 + mem_m[cnt_0-16];
     end
-end
-
-//counter for operation
-always_ff @ (posedge clk) begin
-    if (reset) cnt_2 <= 0;
-    else
-        if(cnt_0 == 0) cnt_2 <= 0;
-        else 
-            if (cnt_0==1) cnt_2 <= cnt_2+1;
-            else cnt_2 <= cnt_2 == 0? 0 : (cnt_2 == 63? cnt_2:cnt_2 + 1);
 end
 
 logic [31:0] ep0_next,ep1_next,ch_next_0,maj_next_0;
@@ -74,7 +78,7 @@ ep1 ep1_0(.x(e),.ep1(ep1_next));
 ch ch_0(.x(e),.y(f),.z(g),.ch(ch_next_0));
 maj maj_0(.x(a),.y(b),.z(c),.maj(maj_next_0));
 
-assign t1 = h + ep1_next + ch_next_0 + mem_k[cnt_2] + mem_m[cnt_2];
+assign t1 = h + ep1_next + ch_next_0 + mem_k[cnt_1] + mem_m[cnt_1];
 assign t2 = ep0_next + maj_next_0;
 
 logic cnt_0is0;
@@ -91,7 +95,7 @@ always_ff @ (posedge clk) begin
         b <= data_out[223:192];
         a <= data_out[255:224];
     end else begin
-        if(!cnt_0is0 && !done) begin
+        if(!cnt_0is0 | (cnt_1==63)) begin
             h <= g;
             g <= f;
             f <= e;
@@ -102,6 +106,12 @@ always_ff @ (posedge clk) begin
             a <= t1 + t2;
         end
     end
+end
+
+// assign done = cnt_1 == 63;
+always_ff @ (posedge clk) begin
+    if(reset) done <= 0;
+    else done <= cnt_1 == 63;
 end
 
 always_ff @ (posedge clk) begin
@@ -153,17 +163,17 @@ end
 //     else done_cnt <= done_cnt + done;
 // end
 
-logic cnt_2is63,cnt_2is63next;
-assign cnt_2is63next = cnt_2==63;
+/* old version
+logic cnt_1is63,cnt_1is63next;
+assign cnt_1is63next = cnt_1==63;
 always_ff @(posedge clk)
-    if(reset) cnt_2is63 <= 0;
-    else cnt_2is63 <= cnt_2is63next;
-
-// logic done_next;
+    if(reset) cnt_1is63 <= 0;
+    else cnt_1is63 <= cnt_1is63next;
 
 always_ff @ (posedge clk) begin
-    done <= !cnt_2is63 && cnt_2is63next;
+    done <= !cnt_1is63 && cnt_1is63next;
 end
+*/
 
 endmodule
 
