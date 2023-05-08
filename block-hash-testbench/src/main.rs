@@ -10,11 +10,12 @@ mod sha256_hw;
 const DEBUG: bool = true;
 
 fn run_test(height: u32) -> Result<(), Box<dyn std::error::Error>> {
+    // GET HEADER BYTES
     let header_bytes = get_block_header(height)?;
 
     // GET GOLDEN HASH
     let mut cursor = Cursor::new(header_bytes);
-    let header = Header::consensus_decode(&mut cursor).unwrap();
+    let header = Header::consensus_decode(&mut cursor)?;
     let gold_hash = header.block_hash().to_raw_hash();
 
     if DEBUG {
@@ -55,7 +56,7 @@ fn get_block_header(height: u32) -> Result<[u8; 80], Box<dyn std::error::Error>>
         reqwest::blocking::get("https://mempool.space/api/block/".to_owned() + &key + "/header")?
             .text()?;
     let mut header_bytes = [0u8; 80];
-    hex::decode_to_slice(resp, &mut header_bytes).unwrap();
+    hex::decode_to_slice(resp, &mut header_bytes)?;
     Ok(header_bytes)
 }
 
