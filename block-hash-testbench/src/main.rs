@@ -1,41 +1,36 @@
+use bitcoin::blockdata::block::Header;
+use bitcoin::consensus::Decodable;
+use bitcoin::hashes::Hash;
 use rand::{thread_rng, Rng};
+use std::io::Cursor;
 
 mod acc;
 mod sha256_hw;
-//mod sha256_sw;
 
 const DEBUG: bool = false;
 
 fn run_test(height: u32) -> Result<(), Box<dyn std::error::Error>> {
-    // SETUP
-    // Get the hash of the block at @height
-    let gold = reqwest::blocking::get(
-        "https://mempool.space/api/block-height/".to_owned() + &height.to_string(),
-    )?
-    .text()?;
-    if DEBUG {
-        println!("{}", gold);
-    }
-    // Get its header, serialize to byte array
-    let resp =
-        reqwest::blocking::get("https://mempool.space/api/block/".to_owned() + &gold + "/header")?
-            .text()?;
-    let mut header_bytes = [0u8; 80];
-    hex::decode_to_slice(resp, &mut header_bytes as &mut [u8]).unwrap();
+    let header_bytes = get_block_header(height)?;
+
+    // GET GOLDEN HASH
+    let mut cursor = Cursor::new(header_bytes);
+    let header = Header::consensus_decode(&mut cursor).unwrap();
+    let gold_hash = header.block_hash().to_raw_hash();
 
     for i in 0..3 {
         print!("{:>6}[{}]... ", height, i);
-        // TEST
-        let hash_1 = sha256_hw::get_hash(&header_bytes, i);
-        let mut hash_2 = sha256_hw::get_hash(&hash_1, i);
-        // Bitcoin is little endian
-        hash_2.reverse();
+        // GET HARDWARE HASH
+        let hw_hash = sha256_hw::get_hash(&header_bytes, i);
+        let hw_hash = sha256_hw::get_hash(&hw_hash, i);
 
-        //CLEANUP
         if DEBUG {
-            println!("{}", hex::encode(&hash_2));
+            println!("");
+            println!("{}", hex::encode(&hw_hash));
+            println!("{}", hex::encode(&gold_hash[..]));
         }
-        if gold == hex::encode(hash_2) {
+
+        //CHECK
+        if gold_hash.as_byte_array() == hw_hash.as_slice() {
             println!("PASS");
         } else {
             println!("FAIL");
@@ -43,6 +38,22 @@ fn run_test(height: u32) -> Result<(), Box<dyn std::error::Error>> {
     }
     println!("");
     Ok(())
+}
+
+fn get_block_header(height: u32) -> Result<[u8; 80], Box<dyn std::error::Error>> {
+    // Get the key of the block at @height
+    let key = reqwest::blocking::get(
+        "https://mempool.space/api/block-height/".to_owned() + &height.to_string(),
+    )?
+    .text()?;
+
+    // Get its header, serialize to byte array
+    let resp =
+        reqwest::blocking::get("https://mempool.space/api/block/".to_owned() + &key + "/header")?
+            .text()?;
+    let mut header_bytes = [0u8; 80];
+    hex::decode_to_slice(resp, &mut header_bytes as &mut [u8]).unwrap();
+    Ok(header_bytes)
 }
 
 fn get_tip_height() -> Result<u32, Box<dyn std::error::Error>> {
