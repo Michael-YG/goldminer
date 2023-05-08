@@ -7,7 +7,7 @@ use std::io::Cursor;
 mod acc;
 mod sha256_hw;
 
-const DEBUG: bool = false;
+const DEBUG: bool = true;
 
 fn run_test(height: u32) -> Result<(), Box<dyn std::error::Error>> {
     let header_bytes = get_block_header(height)?;
@@ -17,16 +17,19 @@ fn run_test(height: u32) -> Result<(), Box<dyn std::error::Error>> {
     let header = Header::consensus_decode(&mut cursor).unwrap();
     let gold_hash = header.block_hash().to_raw_hash();
 
+    if DEBUG {
+        println!(" BLOCK  {}", height);
+        println!("GOLDEN  {}", hex::encode(&gold_hash[..]));
+    }
+
     for i in 0..3 {
-        print!("{:>6}[{}]... ", height, i);
+        print!(" HW[{}]  ", i);
         // GET HARDWARE HASH
         let hw_hash = sha256_hw::get_hash(&header_bytes, i);
         let hw_hash = sha256_hw::get_hash(&hw_hash, i);
 
         if DEBUG {
-            println!("");
-            println!("{}", hex::encode(&hw_hash));
-            println!("{}", hex::encode(&gold_hash[..]));
+            print!("{}  ", hex::encode(&hw_hash));
         }
 
         //CHECK
