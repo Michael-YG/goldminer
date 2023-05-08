@@ -52,7 +52,7 @@ fn get_block_header(height: u32) -> Result<[u8; 80], Box<dyn std::error::Error>>
         reqwest::blocking::get("https://mempool.space/api/block/".to_owned() + &key + "/header")?
             .text()?;
     let mut header_bytes = [0u8; 80];
-    hex::decode_to_slice(resp, &mut header_bytes as &mut [u8]).unwrap();
+    hex::decode_to_slice(resp, &mut header_bytes).unwrap();
     Ok(header_bytes)
 }
 
