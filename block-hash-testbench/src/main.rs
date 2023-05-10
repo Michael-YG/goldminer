@@ -17,28 +17,31 @@ fn run_test(height: u32) -> Result<(), Box<dyn std::error::Error>> {
     // GET GOLDEN HASH
     let mut cursor = Cursor::new(header_bytes);
     let header = Header::consensus_decode(&mut cursor)?;
+    let start = Instant::now();
     let gold_hash = header.block_hash().to_raw_hash();
+    let end = Instant::now();
+    let duration = end - start;
 
     if DEBUG {
         println!(" BLOCK  {}", height);
-        println!("GOLDEN  {}", hex::encode(&gold_hash[..]));
+        print!("GOLDEN  {}", hex::encode(&gold_hash[..]));
+        println!("        {:?}", duration);
     }
 
     for i in 0..3 {
         print!(" HW[{}]  ", i);
         // GET HARDWARE HASH
         let start = Instant::now();
-        let hw_hash = sha256_hw::get_hash(&header_bytes, i);
-        let hw_hash = sha256_hw::get_hash(&hw_hash, i);
+        let hash = sha256_hw::get_hash(&sha256_hw::get_hash(&header_bytes, i), i);
         let end = Instant::now();
         let duration = end - start;
 
         if DEBUG {
-            print!("{}  ", hex::encode(&hw_hash));
+            print!("{}  ", hex::encode(&hash));
         }
 
         //CHECK
-        if gold_hash.as_byte_array() == hw_hash.as_slice() {
+        if gold_hash.as_byte_array() == hash.as_slice() {
             print!("PASS  ");
             println!("{:?}", duration);
         } else {
