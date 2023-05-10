@@ -19,7 +19,7 @@ clean:
 	${MAKE} -C ${KERNEL_SOURCE} SUBDIRS=${PWD} clean
 	${RM} miner
 
-TARFILES = Makefile README acc.h acc.c miner.c
+TARFILES = Makefile README acc.h acc.c miner.c miner.h sha256.h
 TARFILE = sw.tar.gz
 .PHONY : tar
 tar : $(TARFILE)
