@@ -21,6 +21,7 @@ typedef unsigned int  WORD;             // 32-bit word, change to "long" for 16-
 
 typedef struct {
 	BYTE data[64];
+	// BYTE * data;
 	WORD datalen;
 	unsigned long long bitlen;
 	WORD state[8];
@@ -30,5 +31,6 @@ typedef struct {
 void sha256_init(SHA256_CTX *ctx);
 void sha256_update(SHA256_CTX *ctx, const BYTE data[], size_t len);
 void sha256_final(SHA256_CTX *ctx, BYTE hash[]);
+void sha256_transform(SHA256_CTX* ctx, const BYTE data[]);
 
 #endif   // SHA256_H

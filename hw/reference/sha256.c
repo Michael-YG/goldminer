@@ -47,8 +47,11 @@ void sha256_transform(SHA256_CTX *ctx, const BYTE data[])
 	// printf("sha256_transform() is invoked\n");
 	WORD a, b, c, d, e, f, g, h, i, j, t1, t2, m[64];
 
-	for (i = 0, j = 0; i < 16; ++i, j += 4)
-		m[i] = (data[j] << 24) | (data[j + 1] << 16) | (data[j + 2] << 8) | (data[j + 3]);
+	for (i = 0, j = 0; i < 16; ++i, j += 4){
+		// m[i] = (data[j] << 24) | (data[j + 1] << 16) | (data[j + 2] << 8) | (data[j + 3]);
+		m[i] = (data[j]) | (data[j + 1] << 8) | (data[j + 2] << 16) | (data[j + 3] << 24);
+		// printf("m[%d] = %x\n",i,m[i]);
+	}
 	for ( ; i < 64; ++i)
 		m[i] = SIG1(m[i - 2]) + m[i - 7] + SIG0(m[i - 15]) + m[i - 16];
 
@@ -112,6 +115,7 @@ void sha256_update(SHA256_CTX *ctx, const BYTE data[], size_t len)
 			ctx->datalen = 0;
 		}
 	}
+	printf("ctx -> data[0] = %x\n", ctx->data[0]);
 }
 
 void sha256_final(SHA256_CTX *ctx, BYTE hash[])

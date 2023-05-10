@@ -1,4 +1,4 @@
 rm -rf a.out &&
 rm -rf sha256.h.gch && 
-gcc * &&
+gcc *.c &&
 ./a.out

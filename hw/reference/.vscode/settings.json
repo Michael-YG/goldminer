@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "sha256.h": "c",
+        "curl.h": "c",
+        "stdlib.h": "c"
+    }
+}
