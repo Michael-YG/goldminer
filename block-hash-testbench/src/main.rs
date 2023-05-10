@@ -42,7 +42,7 @@ fn run_test(height: u32, gold_time: &mut Duration, hw_time: &mut Duration, sw_ti
             print!(" SW     ");
         }
 
-        // GET HARDWARE HASH
+        // GET HASH
         let start: Instant;
         let end: Instant;
         let duration: Duration;
@@ -50,6 +50,7 @@ fn run_test(height: u32, gold_time: &mut Duration, hw_time: &mut Duration, sw_ti
 
         if hw {
             start = Instant::now();
+            // The i parameter here sets which device to use
             hash = sha256_hw::get_hash(&sha256_hw::get_hash(&header_bytes, i), i);
             end = Instant::now();
             duration = end - start;
