@@ -3,6 +3,7 @@ use bitcoin::consensus::Decodable;
 use bitcoin::hashes::Hash;
 use rand::{thread_rng, Rng};
 use std::io::Cursor;
+use std::time::{Duration, Instant};
 
 mod acc;
 mod sha256_hw;
@@ -26,8 +27,11 @@ fn run_test(height: u32) -> Result<(), Box<dyn std::error::Error>> {
     for i in 0..3 {
         print!(" HW[{}]  ", i);
         // GET HARDWARE HASH
+        let start = Instant::now();
         let hw_hash = sha256_hw::get_hash(&header_bytes, i);
         let hw_hash = sha256_hw::get_hash(&hw_hash, i);
+        let end = Instant::now();
+        let duration = end - start;
 
         if DEBUG {
             print!("{}  ", hex::encode(&hw_hash));
@@ -35,9 +39,11 @@ fn run_test(height: u32) -> Result<(), Box<dyn std::error::Error>> {
 
         //CHECK
         if gold_hash.as_byte_array() == hw_hash.as_slice() {
-            println!("PASS");
+            print!("PASS  ");
+            println!("{:?}", duration);
         } else {
-            println!("FAIL");
+            println!("FAIL  ");
+            println!("{:?}", duration);
         }
     }
     println!("");
