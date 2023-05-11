@@ -76,14 +76,14 @@ static void write_hash(registers_i_t * hash_input, unsigned long virtbase) //dev
 
 static void read_hash(registers_o_t * hash_output, unsigned long virtbase)
 {
-    hash_output->r0 = ioread32(HASHR0(virtbase));
-    hash_output->r1 = ioread32(HASHR1(virtbase));
-    hash_output->r2 = ioread32(HASHR2(virtbase));
-    hash_output->r3 = ioread32(HASHR3(virtbase));
-    hash_output->r4 = ioread32(HASHR4(virtbase));
-    hash_output->r5 = ioread32(HASHR5(virtbase));
-    hash_output->r6 = ioread32(HASHR6(virtbase));
-    hash_output->r7 = ioread32(HASHR7(virtbase));
+    hash_output->r7 = ioread32(HASHR0(virtbase));
+    hash_output->r6 = ioread32(HASHR1(virtbase));
+    hash_output->r5 = ioread32(HASHR2(virtbase));
+    hash_output->r4 = ioread32(HASHR3(virtbase));
+    hash_output->r3 = ioread32(HASHR4(virtbase));
+    hash_output->r2 = ioread32(HASHR5(virtbase));
+    hash_output->r1 = ioread32(HASHR6(virtbase));
+    hash_output->r0 = ioread32(HASHR7(virtbase));
 }
 
 static void write_control(unsigned int control, unsigned long virtbase)
